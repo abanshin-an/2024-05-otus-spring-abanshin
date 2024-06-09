@@ -1,11 +1,11 @@
-package ru.otus.spring.hw.dao;
+package ru.otus.hw.dao;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
-import ru.otus.spring.hw.config.QuestionsFileNameProvider;
-import ru.otus.spring.hw.domain.Question;
-import ru.otus.spring.hw.dto.QuestionDto;
-import ru.otus.spring.hw.exceptions.QuestionsLoadException;
+import ru.otus.hw.config.TestFileNameProvider;
+import ru.otus.hw.dao.dto.QuestionDto;
+import ru.otus.hw.domain.Question;
+import ru.otus.hw.exceptions.QuestionReadException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,23 +15,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class QuestionDaoImpl implements QuestionDao {
-    private final QuestionsFileNameProvider fileNameProvider;
+public class CsvQuestionDao implements QuestionDao {
+    private final TestFileNameProvider fileNameProvider;
 
     @Override
-    public List<Question> findAll() throws QuestionsLoadException {
-        List<QuestionDto> quest = getQuestionsFromCsv(fileNameProvider.getQuestionsFileName());
+    public List<Question> findAll() {
+        List<QuestionDto> quest = getQuestionsFromCsv(fileNameProvider.getTestFileName());
         List<Question> allQuestList = new ArrayList<>();
         for (QuestionDto qst : quest) {
             if (!checkCorrectLine(qst)) {
-                throw new QuestionsLoadException("Not correct question or too little answers");
+                throw new QuestionReadException("Not correct question or too little answers",null);
             }
             allQuestList.add(qst.toDomainObject());
         }
         return allQuestList;
     }
 
-    private List<QuestionDto> getQuestionsFromCsv(String filename) throws QuestionsLoadException {
+    private List<QuestionDto> getQuestionsFromCsv(String filename) throws QuestionReadException {
         try (InputStream inputStream = getFileFromResourceAsStream(filename);
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             return new CsvToBeanBuilder<QuestionDto>(reader)
@@ -41,8 +41,8 @@ public class QuestionDaoImpl implements QuestionDao {
                     .build()
                     .parse();
         } catch (IOException e) {
-            throw new QuestionsLoadException(String.format("Can't read question's file or file %s not found",
-                    fileNameProvider.getQuestionsFileName()), e);
+            throw new QuestionReadException(String.format("Can't read question's file or file %s not found",
+                    fileNameProvider.getTestFileName()), e);
         }
     }
 
@@ -50,13 +50,14 @@ public class QuestionDaoImpl implements QuestionDao {
         return ((qDto.getText().length() > 3) && (qDto.getAnswers().size() > 2));
     }
 
-    private InputStream getFileFromResourceAsStream(String filename) throws QuestionsLoadException {
+    private InputStream getFileFromResourceAsStream(String filename) throws QuestionReadException {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(filename);
         if (inputStream == null) {
-            throw new QuestionsLoadException(String.format("File %s not found", filename));
+            throw new QuestionReadException(String.format("File %s not found", filename),null);
         } else {
             return inputStream;
         }
     }
+
 }

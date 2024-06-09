@@ -15,7 +15,11 @@
     <bean id="questionDao" class="ru.otus.spring.hw.dao.QuestionDaoImpl">
         <constructor-arg index="0" ref="appProp"/>
     </bean>
+    <bean id="answerFormatter" class="ru.otus.spring.hw.dto.AnswerFormatter">
+    </bean>
+
     <bean id="questionServiceImpl" class="ru.otus.spring.hw.service.QuestionServiceImpl">
+        <constructor-arg name="answerFormatter" ref="answerFormatter"/>
         <constructor-arg name="printService" ref="printService"/>
         <constructor-arg name="questionDao" ref="questionDao"/>
     </bean>

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.otus.spring.hw.dao.QuestionDao;
 import ru.otus.spring.hw.domain.Answer;
 import ru.otus.spring.hw.domain.Question;
+import ru.otus.spring.hw.dto.AnswerFormatter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +15,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final PrintService printService;
 
     private final QuestionDao questionDao;
-
+    private final AnswerFormatter answerFormatter;
     @Override
     public void printAll() {
         List<Question> questionList = questionDao.findAll();
@@ -27,7 +28,7 @@ public class QuestionServiceImpl implements QuestionService {
         StringBuilder questionSb = new StringBuilder();
         for (Question qst : questionList) {
             questionSb.append("Question: ").append(qst.getQuestionText()).append(" %n");
-            questionSb.append(qst.getAnswerList().stream().map(Answer::toString).collect(Collectors.joining("%n")));
+            questionSb.append(qst.getAnswerList().stream().map(answerFormatter::format).collect(Collectors.joining("%n")));
             questionSb.append(" %n");
         }
         return questionSb;

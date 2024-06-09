@@ -11,9 +11,5 @@ public class Answer {
 
     private String text;
 
-    private Boolean correctAnswer;
-
-    public String toString() {
-        return (TRUE.equals(correctAnswer) ? "+" : "-") + " " + text;
-    }
+    private boolean correctAnswer;
 }
