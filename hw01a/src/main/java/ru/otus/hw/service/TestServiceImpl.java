@@ -31,7 +31,9 @@ public class TestServiceImpl implements TestService {
         StringBuilder questionSb = new StringBuilder();
         for (Question qst : questionList) {
             questionSb.append("Question: ").append(qst.text()).append(" %n");
-            questionSb.append(qst.answers().stream().map(answerFormatter::format).collect(Collectors.joining("%n")));
+            questionSb.append(qst.answers().stream()
+                    .map(answerFormatter::format)
+                    .collect(Collectors.joining("%n")));
             questionSb.append(" %n");
         }
         return questionSb;

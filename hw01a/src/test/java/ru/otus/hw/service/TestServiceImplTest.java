@@ -2,39 +2,41 @@ package ru.otus.hw.service;
 
 
 import org.junit.jupiter.api.Test;
-import ru.otus.hw.config.AppProperties;
-import ru.otus.hw.dao.CsvQuestionDao;
+import org.mockito.ArgumentCaptor;
 import ru.otus.hw.dao.QuestionDao;
+import ru.otus.hw.domain.Answer;
+import ru.otus.hw.domain.Question;
 import ru.otus.hw.formatters.AnswerFormatter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 class TestServiceImplTest {
 
-    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-
-    private final AppProperties appProperties = mock(AppProperties.class);
-
-    private final QuestionDao questionDao = new CsvQuestionDao(appProperties);
+    private final QuestionDao questionDao = mock(QuestionDao.class);
 
     private final AnswerFormatter answerFormatter = new AnswerFormatter();
 
-    private final IOService ioService = new StreamsIOService(new PrintStream(outputStreamCaptor));
+    private final IOService ioService = mock(StreamsIOService.class);
 
     private final TestServiceImpl testService = new TestServiceImpl(ioService, questionDao, answerFormatter);
 
     @Test
     void executeTest() {
-        doReturn("fixture_questions.csv").when(appProperties).getTestFileName();
+        doReturn(getQuestionList()).when(questionDao).findAll();
         testService.executeTest();
-        var output = outputStreamCaptor.toString();
-        assertNotNull(output);
-        assertThat(output).contains("+ Absolutely not");
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        verify(ioService,times(2)).printFormattedLine(argument.capture());
+        var result=argument.getValue();
+        assertThat(result).contains("- Absolutely not");
+    }
+
+    private List<Question> getQuestionList() {
+        return List.of(new Question("Is there life on Mars?",
+                List.of(new Answer("Science doesn't know this yet",true),
+                        new Answer("Certainly. The red UFO is from Mars. And green is from Venus",false),
+                        new Answer("Absolutely not",false))));
     }
 }

@@ -7,10 +7,7 @@ import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,11 +47,11 @@ public class CsvQuestionDao implements QuestionDao {
         return ((qDto.getText().length() > 3) && (qDto.getAnswers().size() > 2));
     }
 
-    private InputStream getFileFromResourceAsStream(String filename) throws QuestionReadException {
+    private InputStream getFileFromResourceAsStream(String filename) throws FileNotFoundException {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(filename);
         if (inputStream == null) {
-            throw new QuestionReadException(String.format("File %s not found", filename),null);
+            throw new FileNotFoundException("File %s not found");
         } else {
             return inputStream;
         }
