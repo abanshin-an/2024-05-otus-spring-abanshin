@@ -17,7 +17,7 @@ class TestServiceImplTest {
 
     private final QuestionDao questionDao = mock(QuestionDao.class);
 
-    private final AnswerFormatter answerFormatter = new AnswerFormatter();
+    private final AnswerFormatter answerFormatter = mock(AnswerFormatter.class);
 
     private final IOService ioService = mock(StreamsIOService.class);
 
@@ -26,9 +26,10 @@ class TestServiceImplTest {
     @Test
     void executeTest() {
         doReturn(getQuestionList()).when(questionDao).findAll();
+        doReturn("- Absolutely not").when(answerFormatter).format(any());
         testService.executeTest();
         ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-        verify(ioService,times(2)).printFormattedLine(argument.capture());
+                verify(ioService,times(2)).printFormattedLine(argument.capture());
         var result=argument.getValue();
         assertThat(result).contains("- Absolutely not");
     }

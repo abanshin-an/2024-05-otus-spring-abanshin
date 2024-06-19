@@ -7,7 +7,11 @@ import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +25,7 @@ public class CsvQuestionDao implements QuestionDao {
         List<Question> allQuestList = new ArrayList<>();
         for (QuestionDto qst : quest) {
             if (!checkCorrectLine(qst)) {
-                throw new QuestionReadException("Not correct question or too little answers",null);
+                throw new QuestionReadException("Not correct question or too little answers", null);
             }
             allQuestList.add(qst.toDomainObject());
         }
