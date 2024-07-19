@@ -9,5 +9,5 @@ mvn clean compile package
 ```
 Запускать командой
 ```shell
-java  -jar hw01/target/hwset01-1.0.jar
+java  -jar target/hw01-1.0.jar
 ```
