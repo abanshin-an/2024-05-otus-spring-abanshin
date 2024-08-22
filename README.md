@@ -11,3 +11,9 @@ mvn clean compile package
 ```shell
 java  -jar hw01/target/hwset01-1.0.jar
 ```
+
+## Упражнение 2
+Запускать командой
+```shell
+java  -jar hw02-annotation-config/target/hw02-annotation-config-1.0.jar
+```
