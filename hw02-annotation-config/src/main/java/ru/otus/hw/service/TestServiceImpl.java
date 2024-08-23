@@ -28,26 +28,25 @@ public class TestServiceImpl implements TestService {
         var testResult = new TestResult(student);
 
         for (var question : questions) {
-            executeQuestion(question, testResult);
+            answerTheQuestion(question, testResult);
         }
         return testResult;
     }
 
-    private void executeQuestion(Question question, TestResult testResult) {
+    private void answerTheQuestion(Question question, TestResult testResult) {
         var isAnswerValid = false; // Задать вопрос, получить ответ
         ioService.printFormattedLine(question.text());
-        int i = 1;
         int rightAnswer = 0;
-        for (var answer : question.answers()) {
+        for (int i=1; i< question.answers().size(); i++ ) {
+            var answer = question.answers().get(i);
             if (answer.isCorrect()) {
                 rightAnswer = i;
             }
             ioService.printFormattedLine(i + ". " + answer.text());
-            i++;
         }
-        var answer = ioService.readIntForRangeWithPrompt(1, question.answers().size(), "Please input your answer",
+        var studentAnswer = ioService.readIntForRangeWithPrompt(1, question.answers().size(), "Please input your answer",
                 "Please input number from 1 to " + (question.answers().size()));
-        isAnswerValid = answer == rightAnswer;
+        isAnswerValid = studentAnswer == rightAnswer;
         testResult.applyAnswer(question, isAnswerValid);
         ioService.printFormattedLine((isAnswerValid ? ANSI_GREEN + "Correct answer" : ANSI_RED + "Wrong answera" +
                 "a") + ANSI_RESET);

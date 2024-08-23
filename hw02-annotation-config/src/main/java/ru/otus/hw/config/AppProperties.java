@@ -1,17 +1,16 @@
 package ru.otus.hw.config;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Data
-@ConfigurationProperties(prefix = "test")
+@Getter
 public class AppProperties implements TestConfig, TestFileNameProvider {
 
-    // внедрить свойство из application.properties
+    @Value("#{T(java.lang.Integer).parseInt('${test.rightAnswersCountToPass}')}")
     private int rightAnswersCountToPass;
 
-    // внедрить свойство из application.properties
+    @Value("${test.testFileName}")
     private String testFileName;
 }

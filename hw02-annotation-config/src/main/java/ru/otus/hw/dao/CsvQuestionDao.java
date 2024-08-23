@@ -26,8 +26,8 @@ public class CsvQuestionDao implements QuestionDao {
         List<QuestionDto> quest = getQuestionsFromCsv(fileNameProvider.getTestFileName());
         List<Question> allQuestList = new ArrayList<>();
         for (QuestionDto qst : quest) {
-            if (!checkCorrectLine(qst)) {
-                throw new QuestionReadException("Not correct question or too little answers", null);
+            if (!isTheQuestionFormattedCorrectly(qst)) {
+                throw new QuestionReadException("Not correct question or too little answers");
             }
             allQuestList.add(qst.toDomainObject());
         }
@@ -49,7 +49,7 @@ public class CsvQuestionDao implements QuestionDao {
         }
     }
 
-    private boolean checkCorrectLine(QuestionDto qDto) {
+    private boolean isTheQuestionFormattedCorrectly(QuestionDto qDto) {
         return ((qDto.getText().length() > 3) && (qDto.getAnswers().size() > 2));
     }
 
