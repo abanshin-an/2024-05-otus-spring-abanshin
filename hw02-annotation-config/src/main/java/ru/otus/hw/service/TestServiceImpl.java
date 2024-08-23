@@ -48,7 +48,6 @@ public class TestServiceImpl implements TestService {
                 "Please input number from 1 to " + (question.answers().size()));
         isAnswerValid = studentAnswer == rightAnswer;
         testResult.applyAnswer(question, isAnswerValid);
-        ioService.printFormattedLine((isAnswerValid ? ANSI_GREEN + "Correct answer" : ANSI_RED + "Wrong answera" +
-                "a") + ANSI_RESET);
+        ioService.printFormattedLine((isAnswerValid ? ANSI_GREEN + "Correct answer" : ANSI_RED + "Wrong answer") + ANSI_RESET);
     }
 }
