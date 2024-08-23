@@ -2,6 +2,8 @@ package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.otus.hw.formatters.AnsiFormatter;
+import ru.otus.hw.formatters.Tag;
 
 @RequiredArgsConstructor
 @Service
@@ -11,6 +13,8 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
 
     private final IOService ioService;
 
+    private final AnsiFormatter ansiFormatter;
+
     @Override
     public void printLine(String s) {
         ioService.printLine(s);
@@ -19,6 +23,11 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     @Override
     public void printFormattedLine(String s, Object... args) {
         ioService.printFormattedLine(s, args);
+    }
+
+    @Override
+    public void printTagFormattedLine(Tag tag, String s, Object... args) {
+        ioService.printFormattedLine(ansiFormatter.format(tag, s), args);
     }
 
     @Override
@@ -54,19 +63,6 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     @Override
     public String readStringWithPromptLocalized(String promptCode) {
         return ioService.readStringWithPrompt(localizedMessagesService.getMessage(promptCode));
-    }
-
-    @Override
-    public int readIntForRangeLocalized(int min, int max, String errorMessageCode) {
-        return ioService.readIntForRange(min, max, localizedMessagesService.getMessage(errorMessageCode));
-    }
-
-    @Override
-    public int readIntForRangeWithPromptLocalized(int min, int max, String promptCode, String errorMessageCode) {
-        return ioService.readIntForRangeWithPrompt(min, max,
-                localizedMessagesService.getMessage(promptCode),
-                localizedMessagesService.getMessage(errorMessageCode)
-                );
     }
 
     @Override
