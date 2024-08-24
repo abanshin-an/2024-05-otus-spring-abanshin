@@ -34,7 +34,7 @@ public class TestServiceImpl implements TestService {
     }
 
     private void answerTheQuestion(Question question, TestResult testResult) {
-        var isAnswerValid = false; // Задать вопрос, получить ответ
+        var isAnswerValid = false;
         ioService.printFormattedLine(question.text());
         int rightAnswer = 0;
         for (int i=1; i<= question.answers().size(); i++ ) {
