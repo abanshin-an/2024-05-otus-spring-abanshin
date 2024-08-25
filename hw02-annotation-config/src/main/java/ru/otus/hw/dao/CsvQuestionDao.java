@@ -48,8 +48,9 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     private void checkQuestionData(QuestionDto qDto) {
-        if ((qDto.getText().length() < 3) || (qDto.getAnswers().size() < 2))
+        if ((qDto.getText().length() < 3) || (qDto.getAnswers().size() < 2)) {
             throw new QuestionReadException("Not correct question or too little answers");
+        }
     }
 
     private InputStream getFileFromResourceAsStream(String filename) throws FileNotFoundException {

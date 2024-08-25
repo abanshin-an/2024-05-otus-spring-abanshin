@@ -6,15 +6,14 @@ import org.junit.jupiter.api.Test;
 import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.dao.CsvQuestionDao;
 import ru.otus.hw.dao.QuestionDao;
-import ru.otus.hw.domain.Answer;
-import ru.otus.hw.domain.Question;
 import ru.otus.hw.domain.Student;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TestServiceImplTest {
 
@@ -22,20 +21,23 @@ class TestServiceImplTest {
 
     private final QuestionDao questionDao = new CsvQuestionDao(appProperties);
 
-    private final IOService ioService = new StreamsIOService(System.out, System.in);
-
-    private final TestServiceImpl testService = new TestServiceImpl(ioService, questionDao);
-
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     private final InputStream originalIn = System.in;
 
     private final PrintStream originalOut = System.out;
 
+    private IOService ioService;
+
+    private TestServiceImpl testService = new TestServiceImpl(ioService, questionDao);
+
+
     @BeforeEach
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
-        System.setIn(new ByteArrayInputStream("7\n2\n3".getBytes()));
+        System.setIn(new ByteArrayInputStream("1\n3".getBytes()));
+        ioService = new StreamsIOService(System.out, System.in);
+        testService = new TestServiceImpl(ioService, questionDao);
     }
 
     @AfterEach
@@ -47,12 +49,28 @@ class TestServiceImplTest {
     @Test
     void executeTestFor() {
         testService.executeTestFor(new Student("firstName", "lastName"));
+        var s = outContent.toString();
+        assertThat(s).isEqualToNormalizingNewlines(expectedString());
     }
 
-    private List<Question> getQuestionList() {
-        return List.of(new Question("Is there life on Mars?",
-                List.of(new Answer("Science doesn't know this yet",true),
-                        new Answer("Certainly. The red UFO is from Mars. And green is from Venus",false),
-                        new Answer("Absolutely not",false))));
+    private String expectedString() {
+        return
+"""
+                        
+Please answer the questions below
+
+Can nothing exist?
+1. Exist
+2. Not exist
+3. Everything has already been stolen before us
+Please input your answer
+\u001B[31mWrong answer\u001B[0m
+Is our Universe real?
+1. Real
+2. Not real
+3. This is a matrix
+Please input your answer
+\u001B[32mCorrect answer\u001B[0m
+""";
     }
 }

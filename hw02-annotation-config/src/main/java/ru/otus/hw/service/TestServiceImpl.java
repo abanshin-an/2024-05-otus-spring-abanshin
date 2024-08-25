@@ -37,17 +37,19 @@ public class TestServiceImpl implements TestService {
         var isAnswerValid = false;
         ioService.printFormattedLine(question.text());
         int rightAnswer = 0;
-        for (int i=1; i<= question.answers().size(); i++ ) {
-            var answer = question.answers().get(i-1);
+        for (int i = 1; i <= question.answers().size(); i++) {
+            var answer = question.answers().get(i - 1);
             if (answer.isCorrect()) {
                 rightAnswer = i;
             }
             ioService.printFormattedLine(i + ". " + answer.text());
         }
-        var studentAnswer = ioService.readIntForRangeWithPrompt(1, question.answers().size(), "Please input your answer",
+        var studentAnswer = ioService.readIntForRangeWithPrompt(1, question.answers().size(),
+                "Please input your answer",
                 "Please input number from 1 to " + (question.answers().size()));
         isAnswerValid = studentAnswer == rightAnswer;
         testResult.applyAnswer(question, isAnswerValid);
-        ioService.printFormattedLine((isAnswerValid ? ANSI_GREEN + "Correct answer" : ANSI_RED + "Wrong answer") + ANSI_RESET);
+        ioService.printFormattedLine((isAnswerValid ? ANSI_GREEN + "Correct answer" :
+                ANSI_RED + "Wrong answer") + ANSI_RESET);
     }
 }
