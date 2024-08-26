@@ -28,12 +28,13 @@ public class TestServiceImpl implements TestService {
         var testResult = new TestResult(student);
 
         for (var question : questions) {
-            answerTheQuestion(question, testResult);
+            boolean isAnswerValid = askQuestion(question);
+            testResult.applyAnswer(question, isAnswerValid);
         }
         return testResult;
     }
 
-    private void answerTheQuestion(Question question, TestResult testResult) {
+    private boolean askQuestion(Question question) {
         var isAnswerValid = false;
         ioService.printFormattedLine(question.text());
         int rightAnswer = 0;
@@ -42,14 +43,14 @@ public class TestServiceImpl implements TestService {
             if (answer.isCorrect()) {
                 rightAnswer = i;
             }
-            ioService.printFormattedLine(i + ". " + answer.text());
+            ioService.printFormattedLine("%d. %s",i , answer.text());
         }
         var studentAnswer = ioService.readIntForRangeWithPrompt(1, question.answers().size(),
                 "Please input your answer",
                 "Please input number from 1 to " + (question.answers().size()));
         isAnswerValid = studentAnswer == rightAnswer;
-        testResult.applyAnswer(question, isAnswerValid);
         ioService.printFormattedLine((isAnswerValid ? ANSI_GREEN + "Correct answer" :
                 ANSI_RED + "Wrong answer") + ANSI_RESET);
+        return isAnswerValid;
     }
 }
