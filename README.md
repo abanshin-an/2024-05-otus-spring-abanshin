@@ -14,11 +14,13 @@ java  -jar hw01a/target/hw01-1.0.jar
 
 ## Задание 2
 ```shell
-mvn -f hw02-annotation-config/pom.xml clean compile package checkstyle:checkstyle antrun:run@checkstylehtml
+mvn -f hw02-annotation-config/pom.xml clean compile checkstyle:checkstyle package 
 ```
+
 ```shell
 java  -jar hw02-annotation-config/target/hw02-annotation-config-1.0.jar
 ```
+
 ## Задание 3
 Для сборки проекта использовть команду
 ```shell

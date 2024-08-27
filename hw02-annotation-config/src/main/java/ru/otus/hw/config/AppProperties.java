@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Getter
-public class AppProperties implements TestConfig, TestFileNameProvider {
+public class AppProperties implements TestConfig, TestFileNameProvider, IoConfig {
 
     private final int rightAnswersCountToPass;
 
@@ -17,7 +17,7 @@ public class AppProperties implements TestConfig, TestFileNameProvider {
     public AppProperties(
             @Value("${test.rightAnswersCountToPass}") int rightAnswersCountToPass,
             @Value("${test.testFileName}") String testFileName,
-            @Value("${test.maxAnswerAttemps}") int maxAnswerAttemps) {
+            @Value("${io.maxAnswerAttemps}") int maxAnswerAttemps) {
         this.rightAnswersCountToPass = rightAnswersCountToPass;
         this.testFileName = testFileName;
         this.maxAnswerAttemps = maxAnswerAttemps;

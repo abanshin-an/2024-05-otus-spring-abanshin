@@ -2,7 +2,7 @@ package ru.otus.hw.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.otus.hw.config.AppProperties;
+import ru.otus.hw.config.IoConfig;
 import ru.otus.hw.exceptions.AnswerException;
 
 import java.io.InputStream;
@@ -16,15 +16,15 @@ public class StreamsIOService implements IOService {
 
     private final Scanner scanner;
 
-    private final AppProperties appProperties;
+    private final IoConfig ioConfig;
 
     public StreamsIOService(@Value("#{T(System).out}") PrintStream printStream,
                             @Value("#{T(System).in}") InputStream inputStream,
-                            AppProperties appProperties) {
+                            IoConfig ioConfig) {
 
         this.printStream = printStream;
         this.scanner = new Scanner(inputStream);
-        this.appProperties = appProperties;
+        this.ioConfig = ioConfig;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class StreamsIOService implements IOService {
 
     @Override
     public int readIntForRange(int min, int max, String errorMessage) {
-        for (int i = 0; i < appProperties.getMaxAnswerAttemps(); i++) {
+        for (int i = 0; i < ioConfig.getMaxAnswerAttemps(); i++) {
             try {
                 var stringValue = scanner.nextLine();
                 int intValue = Integer.parseInt(stringValue);

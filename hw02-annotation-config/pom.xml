@@ -26,6 +26,44 @@
         </checkstyle.config.url>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>Windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <command.exec>cmd.exe</command.exec>
+                <command.open>start</command.open>
+            </properties>
+        </profile>
+        <profile>
+            <id>macos</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <command.exec>/bin/bash</command.exec>
+                <command.open>open</command.open>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+            </activation>
+            <properties>
+                <command.exec>/bin/bash</command.exec>
+                <command.open>xdg-open</command.open>
+            </properties>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -80,7 +118,6 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
     <build>
         <plugins>
@@ -123,21 +160,19 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
                 <executions>
-                    <execution>
-                        <id>checkstylehtml</id>
-                        <configuration>
-                            <target>
-                                <exec executable="start" vmlauncher="false">
-                                    <arg line="target/site/checkstyle.html"/>
-                                </exec>
-                            </target>
-                        </configuration>
+                    <execution><!-- Run our version calculation script -->
+                        <id>show</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>${command.exec}</executable>
+                            <commandlineArgs>-c "${command.open} target/site/checkstyle.html"</commandlineArgs>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
