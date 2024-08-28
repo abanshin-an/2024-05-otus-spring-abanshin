@@ -30,7 +30,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
             ioService.printFormattedLine("Error reading questions");
             ioService.printLine("Sorry. Please call support.");
         } catch (AnswerException e) {
-            ioService.printFormattedLine("You can't answer in %d attemps", ioConfig.getMaxAnswerAttemps());
+            ioService.printFormattedLine("You can't answer in %d attempts", ioConfig.getMaxAnswerAttempts());
             ioService.printLine("Sorry. You fail test.");
         }
     }

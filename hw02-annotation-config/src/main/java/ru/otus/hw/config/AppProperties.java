@@ -12,14 +12,14 @@ public class AppProperties implements TestConfig, TestFileNameProvider, IoConfig
 
     private final String testFileName;
 
-    private final int maxAnswerAttemps;
+    private final int maxAnswerAttempts;
 
     public AppProperties(
             @Value("${test.rightAnswersCountToPass}") int rightAnswersCountToPass,
             @Value("${test.testFileName}") String testFileName,
-            @Value("${io.maxAnswerAttemps}") int maxAnswerAttemps) {
+            @Value("${io.maxAnswerAttempts}") int maxAnswerAttempts) {
         this.rightAnswersCountToPass = rightAnswersCountToPass;
         this.testFileName = testFileName;
-        this.maxAnswerAttemps = maxAnswerAttemps;
+        this.maxAnswerAttempts = maxAnswerAttempts;
     }
 }

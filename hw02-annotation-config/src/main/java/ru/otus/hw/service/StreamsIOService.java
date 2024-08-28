@@ -50,7 +50,7 @@ public class StreamsIOService implements IOService {
 
     @Override
     public int readIntForRange(int min, int max, String errorMessage) {
-        for (int i = 0; i < ioConfig.getMaxAnswerAttemps(); i++) {
+        for (int i = 0; i < ioConfig.getMaxAnswerAttempts(); i++) {
             try {
                 var stringValue = scanner.nextLine();
                 int intValue = Integer.parseInt(stringValue);
