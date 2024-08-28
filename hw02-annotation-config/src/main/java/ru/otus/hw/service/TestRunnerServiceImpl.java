@@ -2,7 +2,7 @@ package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.otus.hw.config.AppProperties;
+import ru.otus.hw.config.IoConfig;
 import ru.otus.hw.exceptions.AnswerException;
 import ru.otus.hw.exceptions.QuestionReadException;
 
@@ -18,7 +18,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final IOService ioService;
 
-    private final AppProperties appProperties;
+    private final IoConfig ioConfig;
 
     @Override
     public void run() {
@@ -30,7 +30,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
             ioService.printFormattedLine("Error reading questions");
             ioService.printLine("Sorry. Please call support.");
         } catch (AnswerException e) {
-            ioService.printFormattedLine("You can't answer in %d attemps", appProperties.getMaxAnswerAttemps());
+            ioService.printFormattedLine("You can't answer in %d attemps", ioConfig.getMaxAnswerAttemps());
             ioService.printLine("Sorry. You fail test.");
         }
     }
