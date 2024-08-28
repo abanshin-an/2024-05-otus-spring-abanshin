@@ -6,6 +6,7 @@ import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.domain.Student;
 import ru.otus.hw.domain.TestResult;
+import ru.otus.hw.exceptions.AnswerException;
 import ru.otus.hw.formatters.Tag;
 
 @Service
@@ -27,34 +28,42 @@ public class TestServiceImpl implements TestService {
         var testResult = new TestResult(student);
 
         for (var question : questions) {
-            executeQuestion(question, testResult);
+            boolean isAnswerValid = askQuestion(question);
+            testResult.applyAnswer(question, isAnswerValid);
         }
         return testResult;
     }
 
-    private void executeQuestion(Question question, TestResult testResult) {
-        var isAnswerValid = false; // Задать вопрос, получить ответ
-        ioService.printTagFormattedLine(Tag.QUESTION, question.text());
-        int i = 1;
+    private boolean askQuestion(Question question) {
+        var isAnswerValid = false;
+        ioService.printFormattedLine(question.text());
         int rightAnswer = 0;
-        for (var answer : question.answers()) {
+        for (int i = 1; i <= question.answers().size(); i++) {
+            var answer = question.answers().get(i - 1);
             if (answer.isCorrect()) {
                 rightAnswer = i;
             }
-            ioService.printFormattedLine(i + ". " + answer.text());
-            i++;
+            ioService.printFormattedLine("%d. %s", i, answer.text());
         }
-        var answer = ioService.readIntForRangeWithPrompt(1, question.answers().size(),
-                ioService.getMessage("Answer.input"),
-                ioService.getMessage("Answer.range", question.answers().size()));
-        isAnswerValid = answer == rightAnswer;
-        testResult.applyAnswer(question, isAnswerValid);
+        int studentAnswer = getStudentAnswer(question);
+        isAnswerValid = studentAnswer == rightAnswer;
         if (isAnswerValid) {
             ioService.printTagFormattedLine(Tag.ANSWER_CORRECT, ioService.getMessage("Answer.correct"));
         } else {
             ioService.printTagFormattedLine(Tag.ANSWER_WRONG, ioService.getMessage("Answer.wrong"));
         }
-        ioService.printLine("");
+        return isAnswerValid;
     }
 
+    private int getStudentAnswer(Question question) {
+        int studentAnswer;
+        try {
+            studentAnswer = ioService.readIntForRangeWithPrompt(1, question.answers().size(),
+                    ioService.getMessage("Answer.input"),
+                    ioService.getMessage("Answer.range", question.answers().size()));
+        } catch (IllegalArgumentException e) {
+            throw new AnswerException("Error during reading answer");
+        }
+        return studentAnswer;
+    }
 }

@@ -9,5 +9,7 @@ public interface LocalizedIOService extends LocalizedMessagesService, IOService 
 
     void printFormattedLineLocalized(String code, Object ...args);
 
+    void printTagFormattedLineLocalized(Tag tag, String code, Object ...args);
+
     String readStringWithPromptLocalized(String promptCode);
 }

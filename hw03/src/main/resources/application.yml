@@ -9,6 +9,8 @@ spring:
 #logging:
 #  level:
 #    root: debug
+io:
+  maxAnswerAttempts: 3
 
 test:
   rightAnswersCountToPass: 3

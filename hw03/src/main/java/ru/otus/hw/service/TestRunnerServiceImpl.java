@@ -1,11 +1,12 @@
 package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.otus.hw.config.AppProperties;
+import ru.otus.hw.config.IoConfig;
+import ru.otus.hw.exceptions.AnswerException;
+import ru.otus.hw.exceptions.QuestionReadException;
+import ru.otus.hw.formatters.Tag;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TestRunnerServiceImpl implements TestRunnerService {
@@ -16,13 +17,23 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final ResultService resultService;
 
-    private final AppProperties appProperties;
+    private final LocalizedIOService ioService;
+
+    private final IoConfig ioConfig;
 
     @Override
     public void run() {
-        log.debug("locale is set to {}", appProperties.getLocale());
-        var student = studentService.determineCurrentStudent();
-        var testResult = testService.executeTestFor(student);
-        resultService.showResult(testResult);
+        try {
+            var student = studentService.determineCurrentStudent();
+            var testResult = testService.executeTestFor(student);
+            resultService.showResult(testResult);
+        } catch (QuestionReadException e) {
+            ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG,"IoService.fail.reading");
+            ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG,"IoService.fail.support");
+        } catch (AnswerException e) {
+            ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG,"Answer.attempts",
+                    ioConfig.getMaxAnswerAttempts());
+            ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG, "ResultService.fail.test");
+        }
     }
 }

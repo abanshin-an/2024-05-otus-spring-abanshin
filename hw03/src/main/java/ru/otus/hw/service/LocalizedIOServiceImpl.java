@@ -61,6 +61,11 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     }
 
     @Override
+    public void printTagFormattedLineLocalized(Tag tag, String code, Object... args) {
+        printTagFormattedLine(tag, localizedMessagesService.getMessage(code, args));
+    }
+
+    @Override
     public String readStringWithPromptLocalized(String promptCode) {
         return ioService.readStringWithPrompt(localizedMessagesService.getMessage(promptCode));
     }

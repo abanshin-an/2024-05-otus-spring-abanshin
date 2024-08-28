@@ -16,8 +16,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class CsvQuestionDao implements QuestionDao {
     private final TestFileNameProvider fileNameProvider;
 
@@ -26,9 +26,7 @@ public class CsvQuestionDao implements QuestionDao {
         List<QuestionDto> quest = getQuestionsFromCsv(fileNameProvider.getTestFileName());
         List<Question> allQuestList = new ArrayList<>();
         for (QuestionDto qst : quest) {
-            if (!checkCorrectLine(qst)) {
-                throw new QuestionReadException("Not correct question or too little answers", null);
-            }
+            checkQuestionData(qst);
             allQuestList.add(qst.toDomainObject());
         }
         return allQuestList;
@@ -49,8 +47,10 @@ public class CsvQuestionDao implements QuestionDao {
         }
     }
 
-    private boolean checkCorrectLine(QuestionDto qDto) {
-        return ((qDto.getText().length() > 3) && (qDto.getAnswers().size() > 2));
+    private void checkQuestionData(QuestionDto qDto) {
+        if ((qDto.getText().length() < 3) || (qDto.getAnswers().size() < 2)) {
+            throw new QuestionReadException("Not correct question or too little answers");
+        }
     }
 
     private InputStream getFileFromResourceAsStream(String filename) throws FileNotFoundException {
