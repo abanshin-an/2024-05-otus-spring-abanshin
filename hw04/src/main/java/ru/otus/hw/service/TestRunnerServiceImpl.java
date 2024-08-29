@@ -2,13 +2,14 @@ package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import ru.otus.hw.config.AppProperties;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TestRunnerServiceImpl implements TestRunnerService {
+public class TestRunnerServiceImpl implements TestRunnerService, CommandLineRunner {
 
     private final TestService testService;
 
@@ -24,5 +25,10 @@ public class TestRunnerServiceImpl implements TestRunnerService {
         var student = studentService.determineCurrentStudent();
         var testResult = testService.executeTestFor(student);
         resultService.showResult(testResult);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+
     }
 }
