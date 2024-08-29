@@ -28,15 +28,21 @@ public class ApplicationRun {
         testRunnerService.run();
     }
 
-    @ShellMethod(value = "Set locale", key = {"locale"})
+    @ShellMethod(value = "Set locale", key = {"set locale","setl"})
     @SuppressWarnings("unused")
-    public void setTestLocale(@ShellOption String locale) {
+    public void setLocale(@ShellOption String locale) {
         if (!enabledLocales.contains(locale)) {
             localizedIOService.printLine("Invalid locale: " + locale);
             localizedIOService.printLine("Enabled locales: " + enabledLocales);
-            localizedIOService.printLine("Remain locale: " + appProperties.getLocale());
+            localizedIOService.printLine("Remain locale: " + appProperties.getLocale().toLanguageTag());
         } else {
             appProperties.setLocale(locale);
         }
+    }
+
+    @ShellMethod(value = "Get locale", key = {"locale"})
+    @SuppressWarnings("unused")
+    public void getLocale() {
+       localizedIOService.printLine("Current locale: " + appProperties.getLocale().toLanguageTag());
     }
 }

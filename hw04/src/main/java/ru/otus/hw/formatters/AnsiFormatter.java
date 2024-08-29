@@ -2,7 +2,7 @@ package ru.otus.hw.formatters;
 
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 @Component
@@ -29,7 +29,7 @@ public class AnsiFormatter implements Formatter {
     }
 
     static {
-        TAG_MAP = new HashMap<>();
+        TAG_MAP = new EnumMap<>(Tag.class);
         TAG_MAP.put(Tag.QUESTION, ANSI_BOLD);
         TAG_MAP.put(Tag.ANSWER_CORRECT, ANSI_GREEN);
         TAG_MAP.put(Tag.ANSWER_WRONG, ANSI_RED);

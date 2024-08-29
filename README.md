@@ -43,9 +43,5 @@ mvn -f hw04/pom.xml clean compile checkstyle:checkstyle package
 ```
 Английская локализация
 ```shell
-java  -jar -Dtest.locale=en-US hw04/target/hw04-spring-boot-shell-1.0.jar
-```
-Русская локализация
-```shell
-java  -jar -Dtest.locale=ru-RU hw04/target/hw04-spring-boot-shell-1.0.jar
+java  -jar hw04/target/hw04-spring-boot-shell-1.0.jar
 ```

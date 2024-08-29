@@ -14,7 +14,12 @@ import ru.otus.hw.formatters.Tag;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest(properties = "spring.shell.interactive.enabled=false")
 class TestServiceImplTest {

@@ -10,5 +10,5 @@
  ((_/`(____,-'   ${AnsiColor.BLUE}  \________(____  /\_/  (____  /  \___  >____  /__|  ${AnsiColor.BLACK}
 ========================================================================================================================
  ${AnsiColor.BLUE}Current locale is :${AnsiColor.BLACK} ${test.locale}
- ${AnsiColor.BLUE}You can change locale by command :${AnsiColor.BLACK} locale <locale>
+ ${AnsiColor.BLUE}You can change locale by command :${AnsiColor.BLACK} setl <locale>
 ========================================================================================================================
