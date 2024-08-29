@@ -27,7 +27,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
             var testResult = testService.executeTestFor(student);
             resultService.showResult(testResult);
         } catch (QuestionReadException e) {
-            ioService.printFormattedLine("Error reading questions");
+            ioService.printLine("Error reading questions");
             ioService.printLine("Sorry. Please call support.");
         } catch (AnswerException e) {
             ioService.printFormattedLine("You can't answer in %d attempts", ioConfig.getMaxAnswerAttempts());

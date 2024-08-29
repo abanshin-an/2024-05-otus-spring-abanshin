@@ -19,7 +19,7 @@ class TestServiceImplTest {
 
     private final IOService ioService = mock(IOService.class);
 
-    private final TestServiceImpl testService = spy(new TestServiceImpl(ioService, questionDao));
+    private final TestServiceImpl testService = new TestServiceImpl(ioService, questionDao);
 
     private final Student student = new Student("firstName", "lastName");
 
