@@ -30,7 +30,6 @@ class TestServiceImplTest {
         doReturn(getQuestions()).when(questionDao).findAll();
         doReturn("").when(ioService).getMessage(anyString());
         doReturn("").when(ioService).getMessage(anyString(),any());
-//        when(ioService.readIntForRangeWithPrompt(eq(1), eq(3), anyString(), anyString())).thenReturn(1,3);
         doReturn(1,3).when(ioService).readIntForRangeWithPrompt(eq(1), eq(3), anyString(), anyString());
         doReturn("").when(ioService).getMessage("Answer.wrong");
         testService.executeTestFor(student);
