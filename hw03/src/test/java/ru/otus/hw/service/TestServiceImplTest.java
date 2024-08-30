@@ -2,6 +2,9 @@ package ru.otus.hw.service;
 
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.hw.dao.CsvQuestionDao;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
@@ -13,14 +16,17 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 class TestServiceImplTest {
 
+    @MockBean
+    private QuestionDao questionDao;
 
-    private final QuestionDao questionDao = mock(CsvQuestionDao.class);
+    @MockBean
+    private final LocalizedIOService ioService;
 
-    private final LocalizedIOService ioService = mock(LocalizedIOService.class);
-
-    private final TestServiceImpl testService = new TestServiceImpl(ioService, questionDao);
+    @Autowired
+    private final TestServiceImpl testService;
 
     private final Student student = new Student("firstName", "lastName");
 
