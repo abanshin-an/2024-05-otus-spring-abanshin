@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.hw.dao.CsvQuestionDao;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.domain.Student;
+import ru.otus.hw.formatters.AnsiFormatter;
 import ru.otus.hw.formatters.Tag;
 
 import java.util.List;
@@ -23,10 +23,13 @@ class TestServiceImplTest {
     private QuestionDao questionDao;
 
     @MockBean
-    private final LocalizedIOService ioService;
+    private LocalizedIOServiceImpl ioService;
+
+    @MockBean
+    private AnsiFormatter ansiFormatter;
 
     @Autowired
-    private final TestServiceImpl testService;
+    private TestServiceImpl testService;
 
     private final Student student = new Student("firstName", "lastName");
 
