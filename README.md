@@ -35,9 +35,11 @@ java  -jar -Dtest.locale=en-US hw03/target/hw03-spring-boot-1.0.jar
 java  -jar -Dtest.locale=ru-RU hw03/target/hw03-spring-boot-1.0.jar
 ```
 
-### Проверка стиля
+## Задание 5
+```shell
+mvn -f hw05/pom.xml clean compile checkstyle:checkstyle package 
+```
 
 ```shell
-mvn -f hw03/pom.xml checkstyle:checkstyle
-open hw03/target/site/checkstyle.html
+java  -jar hw05/target/hw05-jdbc-1.0.jar
 ```
