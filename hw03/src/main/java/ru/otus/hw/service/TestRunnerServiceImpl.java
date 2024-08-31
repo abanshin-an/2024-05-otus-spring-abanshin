@@ -19,7 +19,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final LocalizedIOService ioService;
 
-    private final IoConfig ioConfig;
+    private final IoConfig ioProperties;
 
     @Override
     public void run() {
@@ -32,7 +32,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
             ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG,"IoService.fail.support");
         } catch (AnswerException e) {
             ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG,"Answer.attempts",
-                    ioConfig.getMaxAnswerAttempts());
+                    ioProperties.getMaxAnswerAttempts());
             ioService.printTagFormattedLineLocalized(Tag.ANSWER_WRONG, "ResultService.fail.test");
         }
     }
