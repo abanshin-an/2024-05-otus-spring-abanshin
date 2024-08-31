@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Setter
 @ConfigurationProperties(prefix = "test")
@@ -17,10 +19,34 @@ public class AppProperties implements TestConfig, TestFileNameProvider, LocaleCo
     @Getter
     private Locale locale;
 
+    private String tryLanguageTag;
+
     private Map<String, String> fileNameByLocaleTag;
 
-    public void setLocale(String locale) {
-        this.locale = Locale.forLanguageTag(locale);
+    public void setFileNameByLocaleTag(Map<String, String> fileNameByLocaleTag) {
+        this.fileNameByLocaleTag = fileNameByLocaleTag;
+        if (fileNameByLocaleTag != null) {
+            if (tryLanguageTag != null) {
+                setLocale(tryLanguageTag);
+                tryLanguageTag = null;
+            }
+        }
+    }
+
+    public void setLocale(String languageTag) {
+        if (fileNameByLocaleTag == null) {
+            tryLanguageTag = languageTag;
+        }
+        if (Objects.nonNull(fileNameByLocaleTag) && getEnabledLocales().contains(languageTag)) {
+            this.locale = Locale.forLanguageTag(languageTag);
+        } else {
+            this.locale = Locale.getDefault();
+        }
+    }
+
+    @Override
+    public Set<String> getEnabledLocales() {
+        return fileNameByLocaleTag.keySet();
     }
 
     @Override

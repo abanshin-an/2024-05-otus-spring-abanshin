@@ -8,8 +8,6 @@ import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.service.LocalizedIOService;
 import ru.otus.hw.service.TestRunnerService;
 
-import java.util.List;
-
 @ShellComponent(value = "Testing run commands")
 @RequiredArgsConstructor
 public class ApplicationRun {
@@ -20,8 +18,6 @@ public class ApplicationRun {
 
     private final LocalizedIOService localizedIOService;
 
-    private final List<String> enabledLocales = List.of("ru-RU", "en-US");
-
     @ShellMethod(value = "Run Testing", key = {"run", "start", "r", "s"})
     @SuppressWarnings("unused")
     public void runTest() {
@@ -31,12 +27,13 @@ public class ApplicationRun {
     @ShellMethod(value = "Set locale", key = {"set locale","setl"})
     @SuppressWarnings("unused")
     public void setLocale(@ShellOption String locale) {
-        if (!enabledLocales.contains(locale)) {
+        if (!appProperties.getEnabledLocales().contains(locale)) {
             localizedIOService.printLine("Invalid locale: " + locale);
-            localizedIOService.printLine("Enabled locales: " + enabledLocales);
+            localizedIOService.printLine("Enabled locales: " + appProperties.getEnabledLocales());
             localizedIOService.printLine("Remain locale: " + appProperties.getLocale().toLanguageTag());
         } else {
             appProperties.setLocale(locale);
+            localizedIOService.printLine("Current locale: " + locale);
         }
     }
 
