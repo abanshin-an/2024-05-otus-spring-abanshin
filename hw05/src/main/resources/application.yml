@@ -6,3 +6,7 @@ spring:
       mode: always
       data-locations: data.sql
       schema-locations: schema.sql
+      
+logging:
+  level:
+    org.springframework.jdbc.core: TRACE

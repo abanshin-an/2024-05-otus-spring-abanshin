@@ -28,15 +28,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JdbcBookRepository implements BookRepository {
 
-    public static final String BOOK_ID = "book_id";
-    public static final String ID = "id";
-    public static final String AUTHOR_ID = "author_id";
-    public static final String BOOK_TITLE = "book_title";
-    public static final String AUTHOR_FULL_NAME = "author_full_name";
-    public static final String FULL_NAME = "full_name";
-    public static final String GENRE_ID = "genre_id";
-    public static final String GENRE_NAME = "genre_name";
-    public static final String TITLE = "title";
+    private static final String BOOK_ID = "book_id";
+
+    private static final String ID = "id";
+
+    private static final String AUTHOR_ID = "author_id";
+
+    private static final String BOOK_TITLE = "book_title";
+
+    private static final String AUTHOR_FULL_NAME = "author_full_name";
+
+    private static final String FULL_NAME = "full_name";
+
+    private static final String GENRE_ID = "genre_id";
+
+    private static final String GENRE_NAME = "genre_name";
+
+    private static final String TITLE = "title";
 
     private final GenreRepository genreRepository;
 
@@ -52,27 +60,25 @@ public class JdbcBookRepository implements BookRepository {
     @Override
     public Optional<Book> findById(long id) {
         Map<String, Object> params = Collections.singletonMap(ID, id);
-        Book book = namedParameterJdbcTemplate.query(
-                """
-                select 
-                    b.id as book_id, 
-                    b.title as book_title, 
-                    a.id as author_id, 
-                    a.full_name as author_full_name, 
-                    g.id as genre_id, 
-                    g.name as genre_name 
-                from books b 
-                left join authors a on b.author_id = a.id 
-                left join books_genres bg on bg.book_id = b.id 
-                left join genres g on g.id = bg.genre_id 
-                where b.id = :id
-                """,
+        Book book = namedParameterJdbcTemplate.query("""
+                        select
+                            b.id as book_id, 
+                            b.title as book_title, 
+                            a.id as author_id, 
+                            a.full_name as author_full_name, 
+                            g.id as genre_id, 
+                            g.name as genre_name 
+                        from books b 
+                        left join authors a on b.author_id = a.id 
+                        left join books_genres bg on bg.book_id = b.id 
+                        left join genres g on g.id = bg.genre_id 
+                        where b.id = :id
+                        """,
                 params, new BookResultSetExtractor());
 
         if (book != null && book.getId() != 0) {
             return Optional.of(book);
-        }
-        else {
+        } else {
             return Optional.empty();
         }
     }
@@ -101,10 +107,9 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private List<Book> getAllBooksWithoutGenres() {
-        return namedParameterJdbcTemplate.query(
-                        """
-                        select b.id, 
-                           b.title, 
+        return namedParameterJdbcTemplate.query("""
+                        select b.id,
+                           b.title,
                            a.id as author_id, 
                            a.full_name as author_full_name
                         from books b 
@@ -131,7 +136,7 @@ public class JdbcBookRepository implements BookRepository {
             }
         });
 
-        for (Book book: booksWithoutGenres) {
+        for (Book book : booksWithoutGenres) {
             book.setGenres(booksWithoutGenresMap.get(book.getId()).getGenres());
         }
     }
@@ -146,7 +151,7 @@ public class JdbcBookRepository implements BookRepository {
         namedParameters.addValue(AUTHOR_ID, book.getAuthor().getId());
 
         namedParameterJdbcTemplate.update("insert into books (title, author_id) values (:title, :author_id) ",
-                namedParameters, keyHolder, new String[] {ID});
+                namedParameters, keyHolder, new String[]{ID});
 
         book.setId(keyHolder.getKey().longValue());
 
@@ -156,8 +161,8 @@ public class JdbcBookRepository implements BookRepository {
 
     private Book update(Book book) {
         int count = namedParameterJdbcTemplate.update("""
-                        update books 
-                        set title = :title, 
+                        update books
+                        set title = :title,
                             author_id = :author_id 
                         where id=:id
                         """,
@@ -191,8 +196,7 @@ public class JdbcBookRepository implements BookRepository {
 
     private void removeGenresRelationsFor(Book book) {
         Map<String, Object> params = Collections.singletonMap(ID, book.getId());
-        namedParameterJdbcTemplate.update("delete from books_genres " +
-                "where book_id = :id", params);
+        namedParameterJdbcTemplate.update("delete from books_genres where book_id = :id", params);
     }
 
     private static class BookRowMapper implements RowMapper<Book> {

@@ -9,11 +9,8 @@ import ru.otus.hw.models.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -36,10 +33,9 @@ public class JdbcGenreRepository implements GenreRepository {
     @Override
     public List<Genre> findAllByIds(Set<Long> ids) {
         try {
-            List<Genre> genre = namedParameterJdbcOperations.
-                    query("select id, name from genres where id = in(:ids)",
+            return namedParameterJdbcOperations.
+                    query("select id, name from genres where id in(:ids)",
                             Collections.singletonMap("ids", ids), new GenreRowMapper());
-            return genre;
         } catch (EmptyResultDataAccessException e) {
             return List.of();
         }
