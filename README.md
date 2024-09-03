@@ -5,7 +5,7 @@ For OTUS Spring homeworks
 ## Задание 1
 Для сборки проекта использовать команду
 ```shell
-mvn -f hw01a/pom.xml clean compile package  checkstyle:checkstyle antrun:run@checkstylehtml
+mvn -f hw01a/pom.xml clean compile checkstyle:checkstyle package 
 ```
 Запускать командой
 ```shell
@@ -22,11 +22,11 @@ java  -jar hw02-annotation-config/target/hw02-annotation-config-1.0.jar
 ```
 
 ## Задание 3
-Для сборки проекта использовть команду
+Для сборки проекта использовать команду
 ```shell
-mvn -f hw03/pom.xml clean compile package
+mvn -f hw03/pom.xml clean compile checkstyle:checkstyle package
 ```
-Английская локализация  
+Английская локализация
 ```shell
 java  -jar -Dtest.locale=en-US hw03/target/hw03-spring-boot-1.0.jar
 ```
