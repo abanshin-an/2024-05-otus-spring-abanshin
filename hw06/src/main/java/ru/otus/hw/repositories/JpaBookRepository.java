@@ -3,6 +3,7 @@ package ru.otus.hw.repositories;
 
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -53,4 +54,14 @@ public class JpaBookRepository implements BookRepository {
         return entityManager.getEntityGraph("author-entity-graph");
     }
 
+    @Override
+    public void deleteById(long id) {
+        Optional<Book> optionalBook = Optional.ofNullable(
+                entityManager.find(Book.class, id));
+        if (optionalBook.isPresent()) {
+            entityManager.remove(optionalBook.get());
+        } else {
+            throw new EntityNotFoundException("No record found with id: " + id);
+        }
+    }
 }
