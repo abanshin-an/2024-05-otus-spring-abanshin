@@ -32,7 +32,7 @@ create table books_genres (
 create table comments
 (
     id bigserial,
-    text varchar,
+    content varchar,
     book_id bigint references books (id) on delete cascade,
     primary key (id)
 );

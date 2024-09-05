@@ -51,7 +51,7 @@ public class JpaBookRepository implements BookRepository {
     }
 
     private EntityGraph<?> getAuthorEntityGraph() {
-        return entityManager.getEntityGraph("author-entity-graph");
+        return entityManager.getEntityGraph("book-entity-graph");
     }
 
     @Override

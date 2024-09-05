@@ -1,4 +1,4 @@
-package ru.otus.hw.repositories;
+package ru.otus.hw.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,22 +8,31 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
+import ru.otus.hw.repositories.JpaAuthorRepository;
+import ru.otus.hw.repositories.JpaBookRepository;
+import ru.otus.hw.repositories.JpaGenreRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе Jdbc для работы с книгами ")
+@DisplayName("Сервис для работы с книгами")
 @DataJpaTest
-@Import({JpaBookRepository.class})
-class JpaBookRepositoryTest {
+@Import({BookServiceImpl.class,
+        JpaAuthorRepository.class, JpaGenreRepository.class, JpaBookRepository.class})
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+class BookServiceImplTest {
 
     @Autowired
-    private JpaBookRepository bookRepository;
+    private BookServiceImpl serviceTest;
 
     private List<Author> dbAuthors;
 
@@ -42,69 +51,70 @@ class JpaBookRepositoryTest {
     @ParameterizedTest
     @MethodSource("getDbBooks")
     void findByIdTest(Book expectedBook) {
-        var actualBook = bookRepository.findById(expectedBook.getId());
-        assertThat(actualBook).isPresent()
+        var actualBook = serviceTest.findById(expectedBook.getId());
+
+        assertThat(actualBook)
+                .isNotNull()
+                .isPresent()
                 .get()
-                .usingRecursiveComparison()
-                .ignoringExpectedNullFields()
-                .ignoringFields("id").isEqualTo(expectedBook);
+                .isEqualTo(expectedBook);
     }
 
     @DisplayName("должен загружать список всех книг")
     @Test
     void findAllTest() {
-        var actualBooks = bookRepository.findAll();
+        var actualBooks = serviceTest.findAll();
         var expectedBooks = dbBooks;
-        assertThat(actualBooks).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                .containsExactlyElementsOf(expectedBooks);
+
+        assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
     }
 
     @DisplayName("должен сохранять новую книгу")
     @Test
-    void saveNewBookTest() {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void insertTest() {
         var expectedBook = new Book(0, "BookTitle_123", dbAuthors.get(0),
-                List.of(dbGenres.get(1), dbGenres.get(2)));
-        var returnedBook = bookRepository.save(expectedBook);
-        assertThat(returnedBook).isNotNull()
+                List.of(dbGenres.get(0), dbGenres.get(2)));
+        var returnedBook = serviceTest.insert(expectedBook.getTitle(),
+                expectedBook.getAuthor().getId(),
+                expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet()));
+
+        assertThat(returnedBook)
+                .isNotNull()
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison()
-                .ignoringExpectedNullFields()
-                .ignoringFields("id").isEqualTo(expectedBook);
-
-        assertThat(bookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
-                .isEqualTo(returnedBook);
+                .ignoringFields("id")
+                .isEqualTo(expectedBook);
     }
 
     @DisplayName("должен сохранять измененную книгу")
     @Test
-    void saveUpdatedBookTest() {
-        var expectedBook = new Book(1L, "BookTitle_10500", dbAuthors.get(2),
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void updateTest() {
+        var expectedBook = new Book(1L, "BookTitle_123", dbAuthors.get(2),
                 List.of(dbGenres.get(4), dbGenres.get(5)));
 
-        assertThat(bookRepository.findById(expectedBook.getId()))
-                .isPresent()
-                .get()
-                .isNotEqualTo(expectedBook);
+        assertThat(serviceTest.findById(expectedBook.getId()))
+                .isPresent();
 
-        var returnedBook = bookRepository.save(expectedBook);
-        assertThat(returnedBook).isNotNull()
-                .matches(book -> book.getId() > 0)
-                .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
+        var returnedBook = serviceTest.update(expectedBook.getId(),
+                expectedBook.getTitle(),
+                expectedBook.getAuthor().getId(),
+                expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet()));
 
-        assertThat(bookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
-                .isEqualTo(returnedBook);
+        assertThat(returnedBook)
+                .isNotNull()
+                .isEqualTo(expectedBook);
     }
 
-    @DisplayName("должен удалять книгу по id ")
+    @DisplayName("должен удалять книгу")
     @Test
-    void deleteBookTest() {
-        assertThat(bookRepository.findById(1L)).isPresent();
-        bookRepository.deleteById(1L);
-        assertThat(bookRepository.findById(1L)).isEmpty();
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void deleteTest() {
+        var book = serviceTest.findById(1L);
+        assertThat(book).isPresent();
+        serviceTest.deleteById(book.get().getId());
+        assertThat(serviceTest.findById(1L)).isEmpty();
     }
 
     private static List<Author> getDbAuthors() {
@@ -134,4 +144,5 @@ class JpaBookRepositoryTest {
         var dbGenres = getDbGenres();
         return getDbBooks(dbAuthors, dbGenres);
     }
+
 }

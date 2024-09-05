@@ -3,8 +3,6 @@ package ru.otus.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.hw.converters.CommentConverter;
-import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
@@ -22,35 +20,34 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final CommentConverter commentConverter;
 
     @Override
-    public Optional<CommentDto> findById(long id) {
-        var commentDto = commentRepository.findById(id).map(commentConverter::modelToDto).orElse(null);
-        return Optional.ofNullable(commentDto);
+    public Optional<Comment> findById(long id) {
+        var comment = commentRepository.findById(id).orElse(null);
+        return Optional.ofNullable(comment);
     }
 
     @Override
-    public List<CommentDto> findByBookId(long bookId) {
-        return commentConverter.modelsToDto(commentRepository.findByBookId(bookId));
+    public List<Comment> findByBookId(long bookId) {
+        return commentRepository.findByBookId(bookId);
     }
 
     @Transactional
     @Override
-    public CommentDto insert(String content, long bookId) {
+    public Comment insert(String content, long bookId) {
         var book = getBookById(bookId);
         var comment =  new Comment(0, content, book);
-        return commentConverter.modelToDto(commentRepository.save(comment));
+        return commentRepository.save(comment);
     }
 
     @Transactional
     @Override
-    public CommentDto update(long id, String content, long bookId) {
+    public Comment update(long id, String content, long bookId) {
         var book = getBookById(bookId);
         var comment = getCommentById(id);
         comment.setContent(content);
         comment.setBook(book);
-        return commentConverter.modelToDto(commentRepository.save(comment));
+        return commentRepository.save(comment);
     }
 
     @Transactional

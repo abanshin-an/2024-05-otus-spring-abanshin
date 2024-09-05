@@ -13,43 +13,25 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
-import jakarta.persistence.NamedSubgraph;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "books")
-@NamedEntityGraph(name = "author-entity-graph", attributeNodes = {@NamedAttributeNode("author")})
-
 @NamedEntityGraph(
-        name = "book-author-genre-entity-graph",
+        name = "book-entity-graph",
         attributeNodes = {
                 @NamedAttributeNode("author")
-                ,@NamedAttributeNode("genres")
-//                ,@NamedAttributeNode(value = "comments", subgraph = "comments-subgraph"),
-//        }
-//       ,subgraphs = {
-//                @NamedSubgraph(
-//                        name = "comments-subgraph",
-//                        attributeNodes = {
-//                                @NamedAttributeNode("book_id")
-//                        }
-//                )
         }
 )
 public class Book {
@@ -59,15 +41,15 @@ public class Book {
     @EqualsAndHashCode.Exclude
     private long id;
 
-    @Column(name="title", nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private Author author;
 
-    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
@@ -75,10 +57,5 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
-
-//    @ToString.Exclude
-//    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "book_id")
-//    private List<Comment> comments;
 
 }
