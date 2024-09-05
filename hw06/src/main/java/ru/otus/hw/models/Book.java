@@ -13,6 +13,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,14 +26,32 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "book")
+@Table(name = "books")
 @NamedEntityGraph(name = "author-entity-graph", attributeNodes = {@NamedAttributeNode("author")})
+
+@NamedEntityGraph(
+        name = "book-author-genre-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("author")
+                ,@NamedAttributeNode("genres")
+//                ,@NamedAttributeNode(value = "comments", subgraph = "comments-subgraph"),
+//        }
+//       ,subgraphs = {
+//                @NamedSubgraph(
+//                        name = "comments-subgraph",
+//                        attributeNodes = {
+//                                @NamedAttributeNode("book_id")
+//                        }
+//                )
+        }
+)
 public class Book {
 
     @Id
@@ -55,4 +75,10 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
+
+//    @ToString.Exclude
+//    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+//    @JoinColumn(name = "book_id")
+//    private List<Comment> comments;
+
 }

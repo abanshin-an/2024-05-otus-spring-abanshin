@@ -1,3 +1,9 @@
+drop table if exists authors;
+drop table if exists genres;
+drop table if exists books;
+drop table if exists books_genres;
+drop table if exists comments;
+
 create table authors (
     id bigserial,
     full_name varchar(255),
@@ -21,4 +27,12 @@ create table books_genres (
     book_id bigint references books(id) on delete cascade,
     genre_id bigint references genres(id) on delete cascade,
     primary key (book_id, genre_id)
+);
+
+create table comments
+(
+    id bigserial,
+    text varchar,
+    book_id bigint references books (id) on delete cascade,
+    primary key (id)
 );
