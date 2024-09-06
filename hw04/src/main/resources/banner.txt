@@ -1,0 +1,14 @@
+ ,_     _
+ |\\_,-~/
+ / _  _ |    ,--.
+(  ${AnsiColor.GREEN}@  @${AnsiColor.BLACK} )   / ,-'
+ \  _T_/-._( (
+ /          `. \ ${AnsiColor.BLUE}       ____.                                    __   ${AnsiColor.BLACK}
+|         _  \ | ${AnsiColor.BLUE}      |    |____ ___  _______      ____ _____ _/  |_ ${AnsiColor.BLACK}
+ \ \ ,  /      | ${AnsiColor.BLUE}      |    \__  \\  \/ /\__  \   _/ ___\\__  \\   __\${AnsiColor.BLACK}
+  || |-_\__   /  ${AnsiColor.BLUE}  /\__|    |/ __ \\   /  / __ \_ \  \___ / __ \|  |  ${AnsiColor.BLACK}
+ ((_/`(____,-'   ${AnsiColor.BLUE}  \________(____  /\_/  (____  /  \___  >____  /__|  ${AnsiColor.BLACK}
+========================================================================================================================
+ ${AnsiColor.BLUE}Try to setup locale :${AnsiColor.BLACK} ${test.locale}
+ ${AnsiColor.BLUE}You can change locale by command :${AnsiColor.BLACK} setl <locale>
+========================================================================================================================
