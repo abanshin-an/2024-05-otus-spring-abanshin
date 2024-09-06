@@ -10,7 +10,7 @@ import ru.otus.hw.service.TestRunnerService;
 
 @ShellComponent(value = "Testing run commands")
 @RequiredArgsConstructor
-public class Controller {
+public class Commands {
 
     private final TestRunnerService testRunnerService;
 
