@@ -1,0 +1,15 @@
+spring:
+  messages:
+    baseName: messages
+    encoding: UTF-8
+    # Не дает свалиться в системную локаль если не найден файл для переданной в MessageSource
+    # Если false то будут браться сообщения из дефолтного файла, если true, то из файла соответствующего системной локали
+    fallbackToSystemLocale: false
+io:
+  maxAnswerAttempts: 3
+test:
+  rightAnswersCountToPass: 3
+  fileNameByLocaleTag:
+    en-US: questions_en_US.csv
+    ru-RU: questions_ru_RU.csv
+  locale: en-US
