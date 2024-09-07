@@ -5,7 +5,7 @@ For OTUS Spring homeworks
 ## Задание 1
 Для сборки проекта использовать команду
 ```shell
-mvn -f hw01a/pom.xml clean compile package  checkstyle:checkstyle antrun:run@checkstylehtml
+mvn -f hw01a/pom.xml clean compile checkstyle:checkstyle package 
 ```
 Запускать командой
 ```shell
