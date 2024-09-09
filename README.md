@@ -62,3 +62,19 @@ mvn -f hw06/pom.xml clean compile checkstyle:checkstyle package
 ```shell
 java  -jar hw06/target/hw06-jpa-1.0.jar
 ```
+## Задание 7
+```shell
+mvn -f hw07/pom.xml clean compile checkstyle:checkstyle package 
+```
+
+```shell
+java  -jar hw07/target/hw06-jpa-1.0.jar
+```
+## Задание 6
+```shell
+mvn -f hw06/pom.xml clean compile checkstyle:checkstyle package 
+```
+
+```shell
+java  -jar hw06/target/hw06-jpa-1.0.jar
+```

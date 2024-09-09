@@ -18,6 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JpaBookRepository implements BookRepository {
 
+    private static final String FETCH_GRAPH = "jakarta.persistence.fetchgraph";
+
     private final EntityManager entityManager;
 
     @Override
@@ -27,7 +29,7 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        var query = entityManager.createQuery("select b from Book b", Book.class);
+        var query = entityManager.createQuery("select b from Book b left join fetch b.genres", Book.class);
         setAuthorEntityGraph(query);
         return query.getResultList();
     }
@@ -43,11 +45,11 @@ public class JpaBookRepository implements BookRepository {
     }
 
     private void setAuthorEntityGraph(TypedQuery<Book> query) {
-        query.setHint(Graphs.FETCH_GRAPH.getVal(), getAuthorEntityGraph());
+        query.setHint(FETCH_GRAPH, getAuthorEntityGraph());
     }
 
     private Map<String, Object> getAuthorHint() {
-        return Collections.singletonMap(Graphs.FETCH_GRAPH.getVal(), getAuthorEntityGraph());
+        return Collections.singletonMap(FETCH_GRAPH, getAuthorEntityGraph());
     }
 
     private EntityGraph<?> getAuthorEntityGraph() {

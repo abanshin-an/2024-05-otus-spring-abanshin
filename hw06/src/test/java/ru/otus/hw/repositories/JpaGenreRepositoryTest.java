@@ -19,13 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JpaGenreRepositoryTest {
 
     @Autowired
-    private JpaGenreRepository repositoryJdbc;
+    private JpaGenreRepository repository;
 
     @DisplayName("должен загружать список всех жанров")
     @Test
     void findAllTest() {
         var expectedGenres = getDbGenres();
-        var actualGenres = repositoryJdbc.findAll();
+        var actualGenres = repository.findAll();
         assertThat(actualGenres)
                 .isNotNull()
                 .isNotEmpty()
@@ -36,7 +36,7 @@ class JpaGenreRepositoryTest {
     @Test
     void findAllByIdsTest() {
         var expectedGenres = List.of(new Genre(1, "Genre_1"));
-        var actualGenres = repositoryJdbc.findAllByIds(new HashSet<>(List.of(1L)));
+        var actualGenres = repository.findAllByIds(new HashSet<>(List.of(1L)));
         assertThat(actualGenres)
                 .isNotNull()
                 .isNotEmpty()

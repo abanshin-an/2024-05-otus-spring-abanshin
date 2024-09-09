@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -24,7 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JpaCommentRepositoryTest {
 
     @Autowired
-    private JpaCommentRepository repositoryJpa;
+    private JpaCommentRepository repository;
+
+    @Autowired
+    private TestEntityManager tem;
 
     private List<Comment> dbComment;
 
@@ -42,7 +46,7 @@ class JpaCommentRepositoryTest {
     @ParameterizedTest
     @MethodSource("getDbComments")
     void findByIdTest(Comment expectedComment) {
-        var actualComment = repositoryJpa.findById(expectedComment.getId());
+        var actualComment = repository.findById(expectedComment.getId());
 
         assertThat(actualComment).isPresent();
         recursiveComparingComment(actualComment.get(), expectedComment);
@@ -55,42 +59,47 @@ class JpaCommentRepositoryTest {
         var expectedComments = dbComment.stream()
                 .filter(comment -> comment.getBook().getId() == book.getId())
                 .toList();
-        var actualComments = repositoryJpa.findByBookId(book.getId());
+        var actualComments = repository.findByBookId(book.getId());
 
         assertThat(expectedComments).containsExactlyElementsOf(actualComments);
     }
 
     @DisplayName("должен сохранять новый комментарий")
     @Test
-    void saveUpdateTest() {
-        var expectedComment = new Comment(0, "Comment_100500", dbBooks.get(0));
-        var returnedComment = repositoryJpa.save(expectedComment);
+    void saveNewTest() {
+        var expectedComment = new Comment(0, "Comment_456", dbBooks.get(0));
 
-        recursiveComparingComment(returnedComment, expectedComment);
+        var returnedComment = repository.save(expectedComment);
+
+        var actualComment = tem.find(Comment.class, returnedComment.getId());
+        recursiveComparingComment(actualComment, expectedComment);
     }
 
     @DisplayName("должен сохранять измененный комментарий")
     @Test
-    void saveNewTest() {
-        var expectedComment = new Comment(1, "Comment_100500", dbBooks.get(1));
+    void saveUpdateTest() {
+        var expectedComment = new Comment(1, "Comment_123", dbBooks.get(1));
 
-        assertThat(repositoryJpa.findById(expectedComment.getId()))
+        assertThat(repository.findById(expectedComment.getId()))
                 .isPresent();
 
-        var returnedComment = repositoryJpa.save(expectedComment);
+        var returnedComment = repository.save(expectedComment);
 
-        assertThat(returnedComment.getId())
+        var actualComment = tem.find(Comment.class, returnedComment.getId());
+        assertThat(actualComment.getId())
                 .isEqualTo(expectedComment.getId());
-        recursiveComparingComment(returnedComment, expectedComment);
+        recursiveComparingComment(actualComment, expectedComment);
     }
 
     @DisplayName("должен удалять комментарий")
     @Test
-    void delete() {
-        var comment = repositoryJpa.findById(1L);
+    void deleteTest() {
+        final long ID = 1L;
+        var comment = repository.findById(ID);
         assertThat(comment).isPresent();
-        repositoryJpa.delete(comment.get());
-        assertThat(repositoryJpa.findById(1L)).isEmpty();
+        repository.delete(comment.get());
+        tem.flush();
+        assertThat(tem.find(Comment.class, ID)).isNull();
     }
 
     private void recursiveComparingComment(Comment actualComment, Comment expectedComment) {

@@ -18,13 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JpaAuthorRepositoryTest {
 
     @Autowired
-    private JpaAuthorRepository repositoryJdbc;
+    private JpaAuthorRepository repository;
 
     @DisplayName("должен загружать список всех авторов")
     @Test
     void findAllTest() {
         var expectedAuthors = getDbAuthors();
-        var actualAuthors = repositoryJdbc.findAll();
+        var actualAuthors = repository.findAll();
         assertThat(actualAuthors)
                 .isNotNull()
                 .isNotEmpty()
@@ -35,7 +35,7 @@ class JpaAuthorRepositoryTest {
     @Test
     void findByIdTest() {
         var expectedAuthor = new Author(2, "Author_2");
-        var actualAuthor = repositoryJdbc.findById(2);
+        var actualAuthor = repository.findById(2);
         assertThat(actualAuthor)
                 .isPresent()
                 .get()
