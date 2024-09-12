@@ -29,6 +29,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookMapper bookMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<BookDto> findById(long id) {
         return bookRepository.findById(id).map(bookMapper::modelToDto);
