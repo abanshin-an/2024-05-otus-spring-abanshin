@@ -11,23 +11,25 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.hw.converters.CommentConverter;
-import ru.otus.hw.models.Author;
+import ru.otus.hw.dtos.AuthorDto;
+import ru.otus.hw.dtos.BookDto;
+import ru.otus.hw.dtos.CommentDto;
+import ru.otus.hw.dtos.GenreDto;
+import ru.otus.hw.mappers.CommentMapperImpl;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
-import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.JpaBookRepository;
 import ru.otus.hw.repositories.JpaCommentRepository;
+import ru.otus.hw.repositories.JpaGenreRepository;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @DisplayName("Сервис для работы с комментариями")
 @DataJpaTest
-@Import({CommentServiceImpl.class, CommentConverter.class,
+@Import({CommentServiceImpl.class, CommentMapperImpl.class, JpaGenreRepository.class,
         JpaBookRepository.class, JpaCommentRepository.class})
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class CommentServiceImplTest {
@@ -35,7 +37,7 @@ class CommentServiceImplTest {
     @Autowired
     private CommentServiceImpl serviceTest;
 
-    private List<Comment> dbComment;
+    private List<CommentDto> dbComment;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +47,7 @@ class CommentServiceImplTest {
     @DisplayName("должен загружать комментарий по id")
     @ParameterizedTest
     @MethodSource("getDbComments")
-    void findByIdTest(Comment expectedComment) {
+    void findByIdTest(CommentDto expectedComment) {
         var actualComment = serviceTest.findById(expectedComment.getId());
         assertThat(actualComment).isPresent();
         assertThat(actualComment)
@@ -58,10 +60,11 @@ class CommentServiceImplTest {
     @DisplayName("должен загружать комментарии по книге")
     @ParameterizedTest
     @MethodSource("getDbBooks")
-    void findByBookIdTest(Book book) {
+    void findByBookIdTest(BookDto book) {
+        var expectedComments = dbComment.get((int) book.getId() - 1);
         var actualComments = serviceTest.findByBookId(book.getId());
 
-        assertThat(actualComments).containsOnly(dbComment.get((int) book.getId() - 1));
+        assertThat(actualComments).containsOnly(expectedComments);
     }
 
     @DisplayName("должен сохранять новый комментарий")
@@ -82,7 +85,7 @@ class CommentServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void saveTest() {
-        var expectedComment = new Comment(1, "Comment_123", new Book());
+        var expectedComment = new CommentDto(1, "Comment_123");
 
         assertThat(serviceTest.findById(expectedComment.getId()))
                 .isPresent();
@@ -105,22 +108,22 @@ class CommentServiceImplTest {
         assertThat(serviceTest.findById(1L)).isEmpty();
     }
 
-    private static List<Comment> getDbComments() {
+    private static List<CommentDto> getDbComments() {
         return IntStream.range(1, 4).boxed()
-                .map(id -> new Comment(id, "Comment_" + id, new Book()))
+                .map(id -> new CommentDto(id, "Comment_" + id))
                 .toList();
     }
 
-    private static List<Book> getDbBooks() {
+    private static List<BookDto> getDbBooks() {
         var dbAuthors = getDbAuthors();
         var dbGenres = getDbGenres();
         return getDbBooks(dbAuthors, dbGenres);
     }
 
 
-    private static List<Book> getDbBooks(List<Author> dbAuthors, List<Genre> dbGenres) {
+    private static List<BookDto> getDbBooks(List<AuthorDto> dbAuthors, List<GenreDto> dbGenres) {
         return IntStream.range(1, 4).boxed()
-                .map(id -> new Book(id,
+                .map(id -> new BookDto(id,
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
                         dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
@@ -128,15 +131,15 @@ class CommentServiceImplTest {
                 .toList();
     }
 
-    private static List<Author> getDbAuthors() {
+    private static List<AuthorDto> getDbAuthors() {
         return IntStream.range(1, 4).boxed()
-                .map(id -> new Author(id, "Author_" + id))
+                .map(id -> new AuthorDto(id, "Author_" + id))
                 .toList();
     }
 
-    private static List<Genre> getDbGenres() {
+    private static List<GenreDto> getDbGenres() {
         return IntStream.range(1, 7).boxed()
-                .map(id -> new Genre(id, "Genre_" + id))
+                .map(id -> new GenreDto(id, "Genre_" + id))
                 .toList();
     }
 

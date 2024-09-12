@@ -28,12 +28,10 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "books")
-@NamedEntityGraph(
-        name = "book-entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode("author")
-        }
-)
+@NamedEntityGraph(name = "book-author-entity-graph",
+        attributeNodes = {@NamedAttributeNode("author")})
+@NamedEntityGraph(name = "book-author-genres-entity-graph",
+        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genres")})
 public class Book {
 
     @Id

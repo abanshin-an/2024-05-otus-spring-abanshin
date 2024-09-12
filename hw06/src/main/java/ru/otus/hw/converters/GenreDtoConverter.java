@@ -1,12 +1,12 @@
 package ru.otus.hw.converters;
 
 import org.springframework.stereotype.Component;
-import ru.otus.hw.models.Genre;
+import ru.otus.hw.dtos.GenreDto;
 
 @Component
-public class GenreConverter {
+public class GenreDtoConverter {
 
-    public String genreToString(Genre genre) {
+    public String convert(GenreDto genre) {
         return "Id: %d, Name: %s".formatted(genre.getId(), genre.getName());
     }
 }

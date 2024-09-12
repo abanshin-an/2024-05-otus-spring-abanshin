@@ -6,11 +6,12 @@ spring:
       mode: always
       data-locations: data.sql
       schema-locations: schema.sql
+
   jpa:
     hibernate:
       ddl-auto: none
     generate-ddl: false
-
-logging:
-  level:
-    org.springframework.jdbc.core: TRACE
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true

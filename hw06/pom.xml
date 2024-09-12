@@ -118,7 +118,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mapstruct</groupId>
+            <groupId>org.mapstruct</groupId>    
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
@@ -144,6 +144,7 @@
                 </dependencies>
                 <configuration>
                     <configLocation>${checkstyle.config.url}</configLocation>
+                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                 </configuration>
                 <executions>
                     <execution>

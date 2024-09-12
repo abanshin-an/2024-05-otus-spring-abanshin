@@ -1,6 +1,5 @@
 package ru.otus.hw.repositories;
 
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,9 +19,9 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе Jdbc для работы с книгами ")
+@DisplayName("Репозиторий на основе Jpa  для работы с книгами ")
 @DataJpaTest
-@Import({JpaBookRepository.class})
+@Import({JpaBookRepository.class,JpaGenreRepository.class})
 class JpaBookRepositoryTest {
 
     @Autowired
@@ -79,7 +78,6 @@ class JpaBookRepositoryTest {
 
     @DisplayName("должен сохранять измененную книгу")
     @Test
-    @Transactional
     void saveUpdatedBookTest() {
         var expectedBook = new Book(1L, "BookTitle_456", dbAuthors.get(2),
                 new ArrayList<>(List.of(dbGenres.get(4), dbGenres.get(5))));
@@ -104,7 +102,6 @@ class JpaBookRepositoryTest {
 
     @DisplayName("должен удалять книгу по id ")
     @Test
-    @Transactional
     void deleteBookTest() {
         final long ID = 1L;
         var book = bookRepository.findById(ID);

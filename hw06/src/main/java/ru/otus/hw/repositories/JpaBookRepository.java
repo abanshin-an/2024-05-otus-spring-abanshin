@@ -3,15 +3,12 @@ package ru.otus.hw.repositories;
 
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Book;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -24,13 +21,14 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        return Optional.ofNullable(entityManager.find(Book.class, id, getAuthorHint()));
+        return Optional.ofNullable(entityManager.find(Book.class, id,
+                Collections.singletonMap(FETCH_GRAPH, getAuthorGenresEntityGraph())));
     }
 
     @Override
     public List<Book> findAll() {
-        var query = entityManager.createQuery("select b from Book b left join fetch b.genres", Book.class);
-        setAuthorEntityGraph(query);
+        var query = entityManager.createQuery("select b from Book b", Book.class);
+        query.setHint(FETCH_GRAPH, getAuthorEntityGraph());
         return query.getResultList();
     }
 
@@ -44,26 +42,19 @@ public class JpaBookRepository implements BookRepository {
         entityManager.remove(book);
     }
 
-    private void setAuthorEntityGraph(TypedQuery<Book> query) {
-        query.setHint(FETCH_GRAPH, getAuthorEntityGraph());
-    }
-
-    private Map<String, Object> getAuthorHint() {
-        return Collections.singletonMap(FETCH_GRAPH, getAuthorEntityGraph());
-    }
-
     private EntityGraph<?> getAuthorEntityGraph() {
-        return entityManager.getEntityGraph("book-entity-graph");
+        return entityManager.getEntityGraph("book-author-entity-graph");
+    }
+
+    private EntityGraph<?> getAuthorGenresEntityGraph() {
+        return entityManager.getEntityGraph("book-author-genres-entity-graph");
     }
 
     @Override
     public void deleteById(long id) {
-        Optional<Book> optionalBook = Optional.ofNullable(
-                entityManager.find(Book.class, id));
-        if (optionalBook.isPresent()) {
-            entityManager.remove(optionalBook.get());
-        } else {
-            throw new EntityNotFoundException("No record found with id: " + id);
-        }
+        entityManager.createQuery("delete from Book b where b.id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
     }
+
 }
