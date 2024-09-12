@@ -35,4 +35,4 @@ create table comments
     content varchar,
     book_id bigint references books (id) on delete cascade,
     primary key (id)
-);
+)
