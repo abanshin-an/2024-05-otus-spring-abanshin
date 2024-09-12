@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of Books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid steelblue;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: steelblue;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: darkblue;
+        }
+
+        .delete-button {
+            background-color: darkred;
+        }
+
+        .delete-button:hover {
+            background-color: red;
+        }
+
+        .comment-button {
+            background-color: orange;
+        }
+
+        .comment-button:hover {
+            background-color: darkorange;
+        }
+
+        .action-buttons form {
+            display: inline;
+        }
+
+        .add-button-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .add-button-container button {
+            background-color: green;
+        }
+
+        .add-button-container button:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>Books:</h3>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <td th:text="${book.title}">Book Title</td>
+            <td th:text="${book.authorDto.fullName}">Author Name</td>
+            <td th:text="${book.genreDto.name}">Genre</td>
+            <td class="action-buttons">
+                <!-- Edit Button -->
+                <form th:action="@{/book/{id}(id=${book.id})}" method="get">
+                    <input type="hidden" name="id" th:value="${book.id}"/>
+                    <button type="submit">Edit</button>
+                </form>
+                <!-- Delete Button -->
+                <form th:action="@{/deleteBook}" method="post">
+                    <input type="hidden" name="id" th:value="${book.id}"/>
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+                <!-- Comments Button -->
+                <form th:action="@{/book/{id}/comments(id=${book.id})}" method="get">
+                    <button type="submit" class="comment-button">View Comments</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="add-button-container">
+        <form th:action="@{/book/new}" method="get">
+            <button type="submit">Add New Book</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

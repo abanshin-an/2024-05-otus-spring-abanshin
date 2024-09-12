@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Edit Comment</title>
+  <style type="text/css">
+    body {
+      padding: 50px;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    textarea {
+      padding: 10px;
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: none;
+      background-color: steelblue;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: darkblue;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      text-decoration: none;
+      color: steelblue;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      color: darkblue;
+    }
+
+    .error {
+      color: red;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h3>Edit Comment for Book ID: <span th:text="${bookId}"></span></h3>
+
+  <form th:action="@{/book/{bookId}/comments/{id}/edit(bookId=${bookId}, id=${comment.id})}" method="post" th:object="${comment}">
+    <label for="text">Comment Text:</label>
+    <textarea id="text" name="text" th:field="*{text}" required></textarea>
+    <div class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
+    <button type="submit">Update Comment</button>
+  </form>
+
+  <a th:href="@{/book/{bookId}/comments(bookId=${bookId})}" class="back-link">Cancel</a>
+
+</div>
+
+</body>
+</html>
