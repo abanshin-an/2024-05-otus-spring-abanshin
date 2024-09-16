@@ -6,5 +6,5 @@ import ru.otus.hw.models.Genre;
 import java.util.List;
 
 public interface GenreRepository extends JpaRepository<Genre, Long> {
-    List<Genre> findAllByIds(List<Integer> genresIds);
+    List<Genre> findByIdIn(List<Long> genresIds);
 }

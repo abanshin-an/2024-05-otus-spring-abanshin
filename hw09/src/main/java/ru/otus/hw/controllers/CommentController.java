@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.CommentDto;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.CommentService;
@@ -28,7 +29,7 @@ public class CommentController {
     @GetMapping
     public String viewComments(@PathVariable("bookId") Long bookId, Model model) {
         List<CommentDto> comments = commentService.findAllByBookId(bookId);
-        String title = bookService.findById(bookId).getTitle();
+        String title = bookService.findById(bookId).orElse(new BookDto()).getTitle();
         model.addAttribute("comments", comments);
         model.addAttribute("bookId", bookId);
         model.addAttribute("title", title);
@@ -46,7 +47,7 @@ public class CommentController {
             model.addAttribute("bookId", bookId);
             return "comment/comments";
         }
-        commentService.insert(commentDto.getText(), bookId);
+        commentService.insert(commentDto.getContent(), bookId);
         return "redirect:/book/" + bookId + "/comments";
     }
 
@@ -54,7 +55,7 @@ public class CommentController {
     public String editCommentPage(@PathVariable("bookId") Long bookId,
                                   @PathVariable("id") Long id,
                                   Model model) {
-        CommentDto comment = commentService.findById(id);
+        CommentDto comment = commentService.findById(id).orElse(new CommentDto());
         model.addAttribute("comment", comment);
         model.addAttribute("bookId", bookId);
         return "comment/editComment";
@@ -68,7 +69,7 @@ public class CommentController {
         if (result.hasErrors()) {
             return "comment/editComment";
         }
-        commentService.update(id, commentDto.getText(), bookId);
+        commentService.update(id, commentDto.getContent(), bookId);
         return "redirect:/book/" + bookId + "/comments";
     }
 

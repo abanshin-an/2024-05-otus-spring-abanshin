@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dtos.BookDto;
+import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.mappers.BookMapper;
 import ru.otus.hw.repositories.AuthorRepository;
@@ -27,6 +28,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookMapper bookMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<BookDto> findById(long id) {
         return bookRepository.findById(id).map(bookMapper::modelToDto);
@@ -67,14 +69,22 @@ public class BookServiceImpl implements BookService {
         if (isEmpty(bookDto.getGenres())) {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
+
+        if ( bookDto.getAuthor() == null ) {
+            throw new IllegalArgumentException("Author id must not be null");
+        }
+
         var authorId = bookDto.getAuthor().getId();
-        var author = authorRepository.findById(authorId)
+
+        authorRepository.findById(authorId)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
-        var genresIds=bookDto.getGenres().stream().toList();
-        var genres = genreRepository.findAllByIds(genresIds);
+
+        var genresIds=bookDto.getGenres().stream().map(GenreDto::getId).toList();
+
+        var genres = genreRepository.findByIdIn(genresIds);
+
         if (isEmpty(genres) || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
-
     }
 }

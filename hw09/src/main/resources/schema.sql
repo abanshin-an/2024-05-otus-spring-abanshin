@@ -1,3 +1,9 @@
+drop table if exists authors;
+drop table if exists genres;
+drop table if exists books;
+drop table if exists books_genres;
+drop table if exists comments;
+
 create table authors
 (
     id        integer auto_increment,
@@ -30,7 +36,7 @@ create table books_genres
 create table comments
 (
     id      integer auto_increment,
-    text    varchar,
+    content varchar,
     book_id bigint references books (id) on delete cascade,
     primary key (id)
-);
+)

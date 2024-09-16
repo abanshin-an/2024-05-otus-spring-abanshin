@@ -3,111 +3,141 @@ package ru.otus.hw.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.hw.dto.AuthorDto;
-import ru.otus.hw.dto.BookDto;
-import ru.otus.hw.dto.GenreDto;
-import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.mappers.AuthorMapperImpl;
+import ru.otus.hw.dtos.AuthorDto;
+import ru.otus.hw.dtos.BookDto;
+import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.mappers.BookMapperImpl;
-import ru.otus.hw.mappers.GenreMapperImpl;
+
+import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
-@DisplayName("Сервис для работы с книгами должен")
+@DisplayName("Сервис для работы с книгами")
 @DataJpaTest
-@Transactional(propagation = Propagation.NEVER)
-@Import({BookServiceImpl.class, BookMapperImpl.class, AuthorMapperImpl.class, GenreMapperImpl.class})
-@Sql(value = "/scriptBeforeTest.sql")
+@Import({BookServiceImpl.class, BookMapperImpl.class})
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 class BookServiceImplTest {
 
-    private static final long FIRST_BOOK_ID = 1L;
-    private static final int BOOKS_COUNT = 3;
-    private static final String NEW_TITLE_FOR_NEW_BOOK = "new title";
-
-
     @Autowired
-    private BookService bookService;
+    private BookServiceImpl serviceTest;
 
-    private BookDto bookById1;
+    private List<AuthorDto> dbAuthors;
+
+    private List<GenreDto> dbGenres;
+
+    private List<BookDto> dbBooks;
 
     @BeforeEach
     void setUp() {
-        bookById1 = new BookDto(FIRST_BOOK_ID, "BookTitle_1",
-                new AuthorDto(1L, "Author_1"),
-                new GenreDto(1L, "Genre_1"));
+        dbAuthors = getDbAuthors();
+        dbGenres = getDbGenres();
+        dbBooks = getDbBooks(dbAuthors, dbGenres);
     }
 
-    @DisplayName("вернуть книгу по ее id")
-    @Test
-    void findById() {
-        var book = bookService.findById(FIRST_BOOK_ID);
-        assertThat(book).isEqualTo(bookById1);
+    @DisplayName("должен загружать книгу по id")
+    @ParameterizedTest
+    @MethodSource("getDbBooks")
+    void findByIdTest(BookDto expectedBook) {
+        var actualBook = serviceTest.findById(expectedBook.getId());
+
+        assertThat(actualBook)
+                .isNotNull()
+                .isPresent()
+                .get()
+                .isEqualTo(expectedBook);
     }
 
-    @DisplayName("вернуть все книги")
+    @DisplayName("должен загружать список всех книг")
     @Test
-    void findAll() {
-        var books = bookService.findAll();
-        assertThat(books).isNotEmpty().size().isEqualTo(BOOKS_COUNT);
-        assertThat(books.get(0)).isNotNull().isEqualTo(bookById1);
-        assertThat(books.get(0).getAuthorDto()).isNotNull().isEqualTo(bookById1.getAuthorDto());
-        assertThat(books.get(0).getGenreDto()).isNotNull().isEqualTo(bookById1.getGenreDto());
+    void findAllTest() {
+        var actualBooks = serviceTest.findAll();
+        var expectedBooks = dbBooks;
+
+        assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
     }
 
-    @DisplayName("сохранить новую книгу")
+    @DisplayName("должен сохранять новую книгу")
     @Test
-    void insert() {
-        var expectedBook = new BookDto(0, NEW_TITLE_FOR_NEW_BOOK, bookById1.getAuthorDto(), bookById1.getGenreDto());
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void insertTest() {
+        var expectedBook = new BookDto(0, "BookTitle_123", dbAuthors.get(0),
+                List.of(dbGenres.get(0), dbGenres.get(2)));
+        var returnedBook = serviceTest.insert(new BookDto(0, expectedBook.getTitle(),expectedBook.getAuthor(),
+                expectedBook.getGenres()));
 
-        var savedBook = bookService.insert(expectedBook);
-        assertThat(savedBook).isNotNull()
+        assertThat(returnedBook)
+                .isNotNull()
                 .matches(book -> book.getId() > 0)
-                .hasFieldOrPropertyWithValue("title", expectedBook.getTitle())
-                .hasFieldOrPropertyWithValue("authorDto", expectedBook.getAuthorDto())
-                .hasFieldOrPropertyWithValue("genreDto", expectedBook.getGenreDto());
-
-        assertThat(savedBook.getAuthorDto().getFullName()).isEqualTo(expectedBook.getAuthorDto().getFullName());
-        assertThat(savedBook.getGenreDto().getName()).isEqualTo(expectedBook.getGenreDto().getName());
-
-        assertThat(bookService.findById(savedBook.getId()))
-                .isEqualTo(savedBook);
-
-        assertThat(bookService.findAll().size()).isEqualTo(BOOKS_COUNT + 1);
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(expectedBook);
     }
 
-    @DisplayName("сохранить обновленную книгу")
+    @DisplayName("должен сохранять измененную книгу")
     @Test
-    void update() {
-        var expectedBook = new BookDto(FIRST_BOOK_ID, NEW_TITLE_FOR_NEW_BOOK, bookById1.getAuthorDto(),
-                bookById1.getGenreDto());
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void updateTest() {
+        var expectedBook = new BookDto(1L, "BookTitle_123", dbAuthors.get(2),
+                List.of(dbGenres.get(4), dbGenres.get(5)));
 
-        var updatedBook = bookService.update(FIRST_BOOK_ID, expectedBook);
+        assertThat(serviceTest.findById(expectedBook.getId()))
+                .isPresent();
 
-        assertThat(updatedBook).isNotNull().isEqualTo(expectedBook);
+        var returnedBook = serviceTest.update(new BookDto(expectedBook.getId(),
+                expectedBook.getTitle(),
+                expectedBook.getAuthor(),
+                expectedBook.getGenres()));
 
-        assertThat(updatedBook.getAuthorDto().getFullName()).isEqualTo(bookById1.getAuthorDto().getFullName());
-        assertThat(updatedBook.getGenreDto().getName()).isEqualTo(bookById1.getGenreDto().getName());
-
-        assertThat(bookService.findById(updatedBook.getId()))
-                .isEqualTo(updatedBook);
-
-        assertThat(bookService.findAll().size()).isEqualTo(BOOKS_COUNT);
+        assertThat(returnedBook)
+                .isNotNull()
+                .isEqualTo(expectedBook);
     }
 
-    @DisplayName("удалить книгу по id")
+    @DisplayName("должен удалять книгу")
     @Test
-    void deleteById() {
-        assertThat(bookService.findById(FIRST_BOOK_ID)).isNotNull();
-        bookService.deleteById(FIRST_BOOK_ID);
-        assertThrows(EntityNotFoundException.class,
-                () -> bookService.findById(FIRST_BOOK_ID));
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void deleteTest() {
+        var book = serviceTest.findById(1L);
+        assertThat(book).isPresent();
+        serviceTest.deleteById(book.get().getId());
+        assertThat(serviceTest.findById(1L)).isEmpty();
     }
+
+    private static List<AuthorDto> getDbAuthors() {
+        return IntStream.range(1, 4).boxed()
+                .map(id -> new AuthorDto(id, "Author_" + id))
+                .toList();
+    }
+
+    private static List<GenreDto> getDbGenres() {
+        return IntStream.range(1, 7).boxed()
+                .map(id -> new GenreDto(id, "Genre_" + id))
+                .toList();
+    }
+
+    private static List<BookDto> getDbBooks(List<AuthorDto> dbAuthors, List<GenreDto> dbGenres) {
+        return IntStream.range(1, 4).boxed()
+                .map(id -> new BookDto(id,
+                        "BookTitle_" + id,
+                        dbAuthors.get(id - 1),
+                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
+                ))
+                .toList();
+    }
+
+    private static List<BookDto> getDbBooks() {
+        var dbAuthors = getDbAuthors();
+        var dbGenres = getDbGenres();
+        return getDbBooks(dbAuthors, dbGenres);
+    }
+
 }
