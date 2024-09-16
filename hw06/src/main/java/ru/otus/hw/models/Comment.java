@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,6 +36,7 @@ public class Comment {
     @EqualsAndHashCode.Exclude
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
+    @BatchSize(size = 100)
     private Book book;
 
 }
