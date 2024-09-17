@@ -13,6 +13,7 @@ import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.CommentDto;
 import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.CommentMapperImpl;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("Сервис для работы с комментариями должен")
 @DataJpaTest
 @Transactional(propagation = Propagation.NEVER)
-@Import({CommentServiceImpl.class})
+@Import({CommentServiceImpl.class, CommentMapperImpl.class})
 class CommentServiceImplTest {
 
     private static final int COMMENTS_COUNT_BY_ID_BOOK = 2;

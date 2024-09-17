@@ -7,7 +7,6 @@ spring:
       schema-locations: schema.sql
       data-locations: data.sql
   jpa:
-    generate-ddl: false
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+    generate-ddl: false
