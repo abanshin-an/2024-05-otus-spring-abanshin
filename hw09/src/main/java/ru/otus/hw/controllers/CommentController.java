@@ -28,7 +28,7 @@ public class CommentController {
 
     @GetMapping
     public String viewComments(@PathVariable("bookId") Long bookId, Model model) {
-        List<CommentDto> comments = commentService.findAllByBookId(bookId);
+        List<CommentDto> comments = commentService.findByBookId(bookId);
         String title = bookService.findById(bookId).orElse(new BookDto()).getTitle();
         model.addAttribute("comments", comments);
         model.addAttribute("bookId", bookId);
@@ -43,7 +43,7 @@ public class CommentController {
                              BindingResult result,
                              Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("comments", commentService.findAllByBookId(bookId));
+            model.addAttribute("comments", commentService.findByBookId(bookId));
             model.addAttribute("bookId", bookId);
             return "comment/comments";
         }
@@ -56,8 +56,8 @@ public class CommentController {
                                   @PathVariable("id") Long id,
                                   Model model) {
         CommentDto comment = commentService.findById(id).orElse(new CommentDto());
-        model.addAttribute("comment", comment);
         model.addAttribute("bookId", bookId);
+        model.addAttribute("comment", comment);
         return "comment/editComment";
     }
 

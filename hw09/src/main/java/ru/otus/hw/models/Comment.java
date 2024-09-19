@@ -11,19 +11,26 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
 @Table(name = "comments")
-@NamedEntityGraph(name = "comments-with-book-author-genre", attributeNodes = {@NamedAttributeNode("book")})
+@NamedEntityGraph(name = "comments-with-book-author-genre",
+        attributeNodes = @NamedAttributeNode(value = "book", subgraph = "subgraph.author"),
+        subgraphs = {
+        @NamedSubgraph(name = "subgraph.author",
+                attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genres")})
+        })
 public class Comment {
 
     @Id
@@ -38,6 +45,7 @@ public class Comment {
     @EqualsAndHashCode.Exclude
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
+    @BatchSize(size = 100)
     private Book book;
 
 }

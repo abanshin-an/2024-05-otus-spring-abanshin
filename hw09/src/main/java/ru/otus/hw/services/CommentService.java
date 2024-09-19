@@ -9,7 +9,7 @@ public interface CommentService {
 
     Optional<CommentDto> findById(long id);
 
-    List<CommentDto> findAllByBookId(long bookId);
+    List<CommentDto> findByBookId(long bookId);
 
     CommentDto insert(String content, long bookId);
 

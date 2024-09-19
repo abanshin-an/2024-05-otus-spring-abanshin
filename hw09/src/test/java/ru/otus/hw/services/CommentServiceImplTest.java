@@ -3,22 +3,27 @@ package ru.otus.hw.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dtos.AuthorDto;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.CommentDto;
 import ru.otus.hw.dtos.GenreDto;
-import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.mappers.CommentMapperImpl;
+import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @DisplayName("Сервис для работы с комментариями должен")
 @DataJpaTest
@@ -26,93 +31,118 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Import({CommentServiceImpl.class, CommentMapperImpl.class})
 class CommentServiceImplTest {
 
-    private static final int COMMENTS_COUNT_BY_ID_BOOK = 2;
-    private static final long COMMENT_ID = 1L;
-    private static final long BOOK_ID = 1L;
-    private static final String COMMENT_CONTENT = "Comment_1_1";
-    private static final String COMMENT_CONTENT_1 = "NEW COMMENT";
-
     @Autowired
-    private CommentService commentService;
+    private CommentService serviceTest;
 
-    private BookDto bookById1;
+    private List<CommentDto> dbComment;
 
-    private CommentDto commentForBookWithId1;
 
     @BeforeEach
     void setUp() {
-        bookById1 = new BookDto(BOOK_ID, "BookTitle_1",
-                new AuthorDto(1L, "Author_1"),
-                List.of(new GenreDto(1L, "Genre_1")));
-        commentForBookWithId1 = new CommentDto(COMMENT_ID, COMMENT_CONTENT, bookById1);
+        dbComment = getDbComments();
     }
 
-    @DisplayName("вернуть комментарий по его id")
-    @Test
-    void findById() {
-        var comment = commentService.findById(COMMENT_ID).orElseThrow(()->new EntityNotFoundException("Not found comment with Id %d".formatted(COMMENT_ID)));
-
-        assertThat(comment).isEqualTo(commentForBookWithId1);
-        assertThat(comment.getBook()).isEqualTo(bookById1);
-        assertThat(comment.getBook().getAuthor()).isEqualTo(bookById1.getAuthor());
-        assertThat(comment.getBook().getGenres()).isEqualTo(bookById1.getGenres());
+    @DisplayName("должен загружать комментарий по id")
+    @ParameterizedTest
+    @MethodSource("getDbComments")
+    void findByIdTest(CommentDto expectedComment) {
+        var actualComment = serviceTest.findById(expectedComment.getId());
+        assertThat(actualComment).isPresent();
+        assertThat(actualComment)
+                .isNotNull()
+                .isPresent()
+                .get()
+                .isEqualTo(expectedComment);
     }
 
-    @DisplayName("вернуть все комментарии для книги по ее id")
-    @Test
-    void findAllByBookId() {
-        var comments = commentService.findAllByBookId(BOOK_ID);
+    @DisplayName("должен загружать комментарии по книге")
+    @ParameterizedTest
+    @MethodSource("getDbBooks")
+    void findByBookIdTest(BookDto book) {
+        var expectedComments = dbComment.get((int) book.getId() - 1);
 
-        assertThat(comments.size()).isEqualTo(COMMENTS_COUNT_BY_ID_BOOK);
-        assertThat(comments.get(0)).isEqualTo(commentForBookWithId1);
-        assertThat(comments.get(0).getBook()).isEqualTo(bookById1);
+        var actualComments = serviceTest.findByBookId(book.getId());
+
+        assertThat(actualComments).containsOnly(expectedComments);
     }
 
-    @DisplayName("сохранить новый комментарий")
+    @DisplayName("должен сохранять новый комментарий")
     @Test
-    void insert() {
-        var expectedComment = new CommentDto(0, COMMENT_CONTENT_1, bookById1);
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void insertTest() {
+        var expectedComment = new Comment(0, "Comment_123", new Book());
 
-        var savedComment = commentService.insert(COMMENT_CONTENT_1, bookById1.getId());
-        assertThat(savedComment).isNotNull()
+        var returnedComment = serviceTest.insert(expectedComment.getContent(), 1);
+
+        assertThat(returnedComment)
+                .isNotNull()
                 .matches(comment -> comment.getId() > 0)
-                .hasFieldOrPropertyWithValue("text", expectedComment.getContent())
-                .hasFieldOrPropertyWithValue("bookDto", expectedComment.getBook());
-
-        assertThat(savedComment.getBook().getGenres()).isEqualTo(bookById1.getGenres());
-        assertThat(savedComment.getBook().getAuthor()).isEqualTo(bookById1.getAuthor());
-
-        assertThat(commentService.findById(savedComment.getId()))
-                .isEqualTo(savedComment);
-
-        assertThat(commentService.findAllByBookId(bookById1.getId()))
-                .size().isEqualTo(COMMENTS_COUNT_BY_ID_BOOK + 1);
+                .usingRecursiveComparison()
+                .ignoringFields("id","book", "author")
+                .isEqualTo(expectedComment);
     }
 
-    @DisplayName("сохранять измененный комментарий")
+    @DisplayName("должен сохранять измененный комментарий")
     @Test
-    void update() {
-        var expectedComment = new CommentDto(COMMENT_ID, COMMENT_CONTENT_1, bookById1);
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void saveTest() {
+        var expectedComment = new CommentDto(1, "Comment_123", getDbBooks().get(0));
 
-        var updatedComment = commentService.update(COMMENT_ID, COMMENT_CONTENT_1, bookById1.getId());
-        assertThat(updatedComment).isNotNull().isEqualTo(expectedComment);
+        assertThat(serviceTest.findById(expectedComment.getId()))
+                .isPresent();
 
-        assertThat(updatedComment.getBook().getGenres()).isEqualTo(expectedComment.getBook().getGenres());
-        assertThat(updatedComment.getBook().getAuthor()).isEqualTo(expectedComment.getBook().getAuthor());
+        var returnedComment = serviceTest.update(expectedComment.getId(),
+                expectedComment.getContent(), 1);
 
-        assertThat(commentService.findById(updatedComment.getId()))
-                .isEqualTo(updatedComment);
-
-        assertThat(commentService.findAllByBookId(bookById1.getId()))
-                .size().isEqualTo(COMMENTS_COUNT_BY_ID_BOOK);
+        assertThat(returnedComment)
+                .isNotNull()
+                .isEqualTo(expectedComment);
     }
 
-    @DisplayName("удалять комментарий по id")
+    @DisplayName("должен удалять комментарий")
     @Test
-    void deleteById() {
-        assertThat(commentService.findById(COMMENT_ID)).isNotNull();
-        commentService.deleteById(1L);
-        assertThrows(EntityNotFoundException.class,
-                () -> commentService.findById(COMMENT_ID));
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void deleteTest() {
+        var comment = serviceTest.findById(1L);
+        assertThat(comment).isPresent();
+        serviceTest.deleteById(comment.get().getId());
+        assertThat(serviceTest.findById(1L)).isEmpty();
+    }
+
+
+    private static List<CommentDto> getDbComments() {
+        var books = getDbBooks();
+        return IntStream.range(1, 4).boxed()
+                .map(id -> new CommentDto(id, "Comment_" + id, books.get(id-1)))
+                .toList();
+    }
+
+    private static List<BookDto> getDbBooks() {
+        var dbAuthors = getDbAuthors();
+        var dbGenres = getDbGenres();
+        return getDbBooks(dbAuthors, dbGenres);
+    }
+
+
+    private static List<BookDto> getDbBooks(List<AuthorDto> dbAuthors, List<GenreDto> dbGenres) {
+        return IntStream.range(1, 4).boxed()
+                .map(id -> new BookDto(id,
+                        "BookTitle_" + id,
+                        dbAuthors.get(id - 1),
+                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
+                ))
+                .toList();
+    }
+
+    private static List<AuthorDto> getDbAuthors() {
+        return IntStream.range(1, 4).boxed()
+                .map(id -> new AuthorDto(id, "Author_" + id))
+                .toList();
+    }
+
+    private static List<GenreDto> getDbGenres() {
+        return IntStream.range(1, 7).boxed()
+                .map(id -> new GenreDto(id, "Genre_" + id))
+                .toList();
     }
 }

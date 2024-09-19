@@ -1,7 +1,6 @@
 package ru.otus.hw.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,22 +19,21 @@ import java.util.Optional;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-@Disabled
 @WebMvcTest(CommentController.class)
 class CommentControllerTest {
 
     private static final long BOOK_ID = 1L;
     private static final long COMMENT_ID = 1L;
 
-    private static final String COMMENT_TEXT = "Great book!";
-    private static final String NEW_COMMENT_TEXT = "new comment";
+    private static final String COMMENT_TEXT = "Good book";
+    private static final String NEW_COMMENT_TEXT = "Very good book";
     private static final String TITLE_FOR_BOOK = "BookTitle_1";
 
     @Autowired
@@ -61,7 +59,7 @@ class CommentControllerTest {
 
     @Test
     void viewComments() throws Exception {
-        when(commentService.findAllByBookId(BOOK_ID)).thenReturn(comments);
+        when(commentService.findByBookId(BOOK_ID)).thenReturn(comments);
         when(bookService.findById(BOOK_ID))
                 .thenReturn(Optional.of(bookByFirstId));
 
@@ -77,7 +75,7 @@ class CommentControllerTest {
     void addComment() throws Exception {
 
         mvc.perform(post("/book/{bookId}/comments", BOOK_ID)
-                        .param("text", NEW_COMMENT_TEXT))
+                        .param("content", NEW_COMMENT_TEXT))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/book/" + BOOK_ID + "/comments"));
 
@@ -99,7 +97,7 @@ class CommentControllerTest {
     @Test
     void updateComment() throws Exception {
         mvc.perform(post("/book/{bookId}/comments/{id}/edit", BOOK_ID, COMMENT_ID)
-                        .param("text", NEW_COMMENT_TEXT))
+                        .param("content", NEW_COMMENT_TEXT))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/book/" + BOOK_ID + "/comments"));
 

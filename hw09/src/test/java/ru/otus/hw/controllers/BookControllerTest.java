@@ -1,7 +1,6 @@
 package ru.otus.hw.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,14 +21,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-@Disabled
 @WebMvcTest(BookController.class)
 class BookControllerTest {
 
@@ -80,10 +78,10 @@ class BookControllerTest {
 
         mvc.perform(get("/book/1"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("book", "genres", "authors"))
+                .andExpect(model().attributeExists("book", "allGenres", "author"))
                 .andExpect(model().attribute("book", bookByFirstId))
-                .andExpect(model().attribute("genres", genres))
-                .andExpect(model().attribute("authors", authors))
+                .andExpect(model().attribute("allGenres", genres))
+                .andExpect(model().attribute("author", authors))
                 .andExpect(view().name("book/editBook"));
     }
 
@@ -95,9 +93,8 @@ class BookControllerTest {
                         List.of(new GenreDto(1L, "Genre 1"))));
         mvc.perform(post("/book/1")
                         .param("title", "Updated Book")
-                        .param("authorDto.id", "1")
-                        .param("genreDto.id", "1"))
-                .andExpect(status().is3xxRedirection())
+                        .param("author.id", "1"))
+ ' ;\;\'2;3r\;'23o-                .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
 
@@ -111,9 +108,9 @@ class BookControllerTest {
 
         mvc.perform(get("/book/new"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("book", "genres", "authors"))
-                .andExpect(model().attribute("authors", authors))
-                .andExpect(model().attribute("genres", genres))
+                .andExpect(model().attributeExists("book", "allGenres", "author"))
+                .andExpect(model().attribute("author", authors))
+                .andExpect(model().attribute("allGenres", genres))
                 .andExpect(view().name("book/editBook"));
     }
 
@@ -124,8 +121,8 @@ class BookControllerTest {
 
         mvc.perform(post("/book/new")
                         .param("title", bookByFirstId.getTitle())
-                        .param("authorDto.id", String.valueOf(bookByFirstId.getAuthor().getId()))
-                        .param("genreDto.id", String.valueOf(bookByFirstId.getGenres().get(0).getId())))
+                        .param("author.id", String.valueOf(bookByFirstId.getAuthor().getId()))
+                        .param("genres.id", "1","2"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }

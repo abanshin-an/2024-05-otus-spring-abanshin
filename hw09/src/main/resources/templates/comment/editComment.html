@@ -85,8 +85,8 @@
 
   <form th:action="@{/book/{bookId}/comments/{id}/edit(bookId=${bookId}, id=${comment.id})}" method="post" th:object="${comment}">
     <label for="text">Comment Text:</label>
-    <textarea id="text" name="text" th:field="*{text}" required></textarea>
-    <div class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
+    <textarea id="text" name="content" th:field="*{content}" required></textarea>
+    <div class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
     <button type="submit">Update Comment</button>
   </form>
 

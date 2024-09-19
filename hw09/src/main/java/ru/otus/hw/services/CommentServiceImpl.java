@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findAllByBookId(long bookId) {
+    public List<CommentDto> findByBookId(long bookId) {
         return commentMapper.modelsToDto(commentRepository.findAllByBookId(bookId));
     }
 

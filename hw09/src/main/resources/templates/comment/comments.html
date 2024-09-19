@@ -104,8 +104,8 @@
 
     <form th:action="@{/book/{bookId}/comments(bookId=${bookId})}" method="post" th:object="${comment}">
         <label for="text">Comment Text:</label>
-        <textarea id="text" name="text" th:field="*{text}" required></textarea>
-        <div class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
+        <textarea id="text" name="text" th:field="*{content}" required></textarea>
+        <div class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
         <button type="submit" class="add-button">Add Comment</button>
     </form>
 
@@ -113,7 +113,7 @@
         <h4>Existing Comments:</h4>
         <ul>
             <li th:each="comment : ${comments}">
-                <p th:text="${comment.text}"></p>
+                <p th:text="${comment.content}"></p>
                 <form th:action="@{/book/{bookId}/comments/{id}/edit(bookId=${bookId}, id=${comment.id})}" style="display:inline">
                     <button type="submit" class="edit-button">Edit</button>
                 </form>

@@ -38,18 +38,14 @@ public class BookController {
     public String editBookPage(@PathVariable("id") Long id, Model model) {
         BookDto bookDto = bookService.findById(id).orElse(new BookDto());
         model.addAttribute("book", bookDto);
-        model.addAttribute("genres", genreService.findAll());
-        model.addAttribute("authors", authorService.findAll());
-        return "book/editBook";
+        return setupModel(model);
     }
 
     @PostMapping("/book/{id}")
-    public String updateBook(@PathVariable("id") Long id, @Valid @ModelAttribute("book") BookDto bookDto,
+    public String updateBook(@PathVariable("id") Long id, @Valid @ModelAttribute("book") BookDto bookDto, @ModelAttribute("genres") String genreIds,
                              BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("genres", genreService.findAll());
-            model.addAttribute("authors", authorService.findAll());
-            return "book/editBook";
+            return setupModel(model);
         }
         bookService.update(bookDto);
         return "redirect:/";
@@ -58,17 +54,19 @@ public class BookController {
     @GetMapping("/book/new")
     public String newBookPage(Model model) {
         model.addAttribute("book", new BookDto());
-        model.addAttribute("genres", genreService.findAll());
-        model.addAttribute("authors", authorService.findAll());
+        return setupModel(model);
+    }
+
+    private String setupModel(Model model) {
+        model.addAttribute("allGenres", genreService.findAll());
+        model.addAttribute("author", authorService.findAll());
         return "book/editBook";
     }
 
     @PostMapping("/book/new")
     public String addNewBook(@Valid @ModelAttribute("book") BookDto bookDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("genres", genreService.findAll());
-            model.addAttribute("authors", authorService.findAll());
-            return "book/editBook";
+            return setupModel(model);
         }
         bookService.insert(bookDto);
         return "redirect:/";

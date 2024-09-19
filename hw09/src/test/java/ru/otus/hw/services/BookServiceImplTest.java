@@ -69,8 +69,10 @@ class BookServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void insertTest() {
-        var expectedBook = new BookDto(0, "BookTitle_123", dbAuthors.get(0),
+
+        var expectedBook = new BookDto(0, "BookTitle_321", dbAuthors.get(0),
                 List.of(dbGenres.get(0), dbGenres.get(2)));
+
         var returnedBook = serviceTest.insert(new BookDto(0, expectedBook.getTitle(),expectedBook.getAuthor(),
                 expectedBook.getGenres()));
 

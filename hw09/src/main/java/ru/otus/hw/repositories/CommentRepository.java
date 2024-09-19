@@ -12,5 +12,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, value = "comments-with-book-author-genre")
     Optional<Comment> findById(long id);
 
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, value = "comments-with-book-author-genre")
     List<Comment> findAllByBookId(long bookId);
 }
