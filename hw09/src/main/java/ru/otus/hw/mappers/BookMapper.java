@@ -14,5 +14,4 @@ public interface BookMapper {
 
     List<BookDto> modelsToDto(List<Book> models);
 
-    Book modelFromDto(BookDto dto);
 }

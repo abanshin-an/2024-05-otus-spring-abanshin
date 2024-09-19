@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> findByBookId(long bookId) {
-        return commentMapper.modelsToDto(commentRepository.findAllByBookId(bookId));
+        return commentMapper.modelsToDto(commentRepository.findByBookId(bookId));
     }
 
     @Transactional

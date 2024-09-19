@@ -24,18 +24,16 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-@DisplayName("Сервис для работы с комментариями должен")
+@DisplayName("Сервис для работы с комментариями")
 @DataJpaTest
-@Transactional(propagation = Propagation.NEVER)
 @Import({CommentServiceImpl.class, CommentMapperImpl.class})
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 class CommentServiceImplTest {
 
     @Autowired
-    private CommentService serviceTest;
+    private CommentServiceImpl serviceTest;
 
     private List<CommentDto> dbComment;
-
 
     @BeforeEach
     void setUp() {
@@ -60,7 +58,6 @@ class CommentServiceImplTest {
     @MethodSource("getDbBooks")
     void findByBookIdTest(BookDto book) {
         var expectedComments = dbComment.get((int) book.getId() - 1);
-
         var actualComments = serviceTest.findByBookId(book.getId());
 
         assertThat(actualComments).containsOnly(expectedComments);
@@ -71,9 +68,7 @@ class CommentServiceImplTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void insertTest() {
         var expectedComment = new Comment(0, "Comment_123", new Book());
-
         var returnedComment = serviceTest.insert(expectedComment.getContent(), 1);
-
         assertThat(returnedComment)
                 .isNotNull()
                 .matches(comment -> comment.getId() > 0)
@@ -86,7 +81,7 @@ class CommentServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void saveTest() {
-        var expectedComment = new CommentDto(1, "Comment_123", getDbBooks().get(0));
+        var expectedComment = new CommentDto(1, "Comment_123");
 
         assertThat(serviceTest.findById(expectedComment.getId()))
                 .isPresent();
@@ -109,11 +104,9 @@ class CommentServiceImplTest {
         assertThat(serviceTest.findById(1L)).isEmpty();
     }
 
-
     private static List<CommentDto> getDbComments() {
-        var books = getDbBooks();
         return IntStream.range(1, 4).boxed()
-                .map(id -> new CommentDto(id, "Comment_" + id, books.get(id-1)))
+                .map(id -> new CommentDto(id, "Comment_" + id))
                 .toList();
     }
 
@@ -145,4 +138,5 @@ class CommentServiceImplTest {
                 .map(id -> new GenreDto(id, "Genre_" + id))
                 .toList();
     }
+
 }
