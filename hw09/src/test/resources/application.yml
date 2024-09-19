@@ -13,3 +13,7 @@ spring:
     hibernate:
       ddl-auto: none
     generate-ddl: false
+
+logging:
+    level:
+      org.springframework.web: DEBUG

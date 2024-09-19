@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
@@ -20,6 +20,14 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class BookController {
+
+    private static final String REDIRECT = "redirect:/";
+
+    private static final String BOOK_BY_ID = "/book/{id}";
+
+    private static final String BOOK = "/book/";
+
+    private static final String BOOK_NEW = "/book/new";
 
     private final BookService bookService;
 
@@ -34,47 +42,47 @@ public class BookController {
         return "index";
     }
 
-    @GetMapping("/book/{id}")
+    @GetMapping(BOOK_BY_ID)
     public String editBookPage(@PathVariable("id") Long id, Model model) {
         BookDto bookDto = bookService.findById(id).orElse(new BookDto());
         model.addAttribute("book", bookDto);
         return setupModel(model);
     }
 
-    @PostMapping("/book/{id}")
-    public String updateBook(@PathVariable("id") Long id, @Valid @ModelAttribute("book") BookDto bookDto, @ModelAttribute("genres") String genreIds,
+    @PostMapping(BOOK)
+    public String updateBook(@Valid @ModelAttribute("book") BookDto bookDto, @ModelAttribute("genres") String genreIds,
                              BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return setupModel(model);
         }
         bookService.update(bookDto);
-        return "redirect:/";
+        return REDIRECT;
     }
 
-    @GetMapping("/book/new")
+    @GetMapping(BOOK_NEW)
     public String newBookPage(Model model) {
         model.addAttribute("book", new BookDto());
         return setupModel(model);
     }
 
-    private String setupModel(Model model) {
-        model.addAttribute("allGenres", genreService.findAll());
-        model.addAttribute("author", authorService.findAll());
-        return "book/editBook";
-    }
-
-    @PostMapping("/book/new")
+    @PostMapping(BOOK_NEW)
     public String addNewBook(@Valid @ModelAttribute("book") BookDto bookDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return setupModel(model);
         }
         bookService.insert(bookDto);
-        return "redirect:/";
+        return REDIRECT;
     }
 
-    @PostMapping("/deleteBook")
-    public String deleteBook(@RequestParam("id") Long id) {
+    @DeleteMapping("/book/{id}")
+    public String deleteBook(@PathVariable("id") Long id) {
         bookService.deleteById(id);
-        return "redirect:/";
+        return REDIRECT;
+    }
+
+    private String setupModel(Model model) {
+        model.addAttribute("allGenres", genreService.findAll());
+        model.addAttribute("author", authorService.findAll());
+        return "book/edit";
     }
 }

@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -82,19 +83,18 @@ class BookControllerTest {
                 .andExpect(model().attribute("book", bookByFirstId))
                 .andExpect(model().attribute("allGenres", genres))
                 .andExpect(model().attribute("author", authors))
-                .andExpect(view().name("book/editBook"));
+                .andExpect(view().name("book/edit"));
     }
 
     @Test
     void updateBook() throws Exception {
-        when(bookService.update(any(BookDto.class)))
-                .thenReturn(new BookDto(1L, "Updated Book",
-                        new AuthorDto(1L, "Author 1"),
-                        List.of(new GenreDto(1L, "Genre 1"))));
-        mvc.perform(post("/book/1")
-                        .param("title", "Updated Book")
-                        .param("author.id", "1"))
- ' ;\;\'2;3r\;'23o-                .andExpect(status().is3xxRedirection())
+        var book = new BookDto(1L, "Updated Book",
+                new AuthorDto(1L, "Author 1"),
+                List.of(new GenreDto(1L, "Genre 1")));
+        mvc.perform(post("/book/")
+                          .flashAttr("book", book)
+                )
+                .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
 
@@ -111,7 +111,7 @@ class BookControllerTest {
                 .andExpect(model().attributeExists("book", "allGenres", "author"))
                 .andExpect(model().attribute("author", authors))
                 .andExpect(model().attribute("allGenres", genres))
-                .andExpect(view().name("book/editBook"));
+                .andExpect(view().name("book/edit"));
     }
 
     @Test
@@ -131,9 +131,9 @@ class BookControllerTest {
     void deleteBook() throws Exception {
         doNothing().when(bookService).deleteById(anyLong());
 
-        mvc.perform(post("/deleteBook")
-                        .param("id", "1"))
+        mvc.perform(delete("/book/1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
+
 }
