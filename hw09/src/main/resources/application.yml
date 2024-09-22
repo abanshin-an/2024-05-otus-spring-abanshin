@@ -4,8 +4,8 @@ spring:
   sql:
     init:
       mode: always
-      data-locations: data.sql
-      schema-locations: schema.sql
+      data-locations: optional:classpath*:data.sql
+      schema-locations: optional:classpath*:schema.sql
 
   jpa:
     hibernate:
@@ -15,3 +15,9 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG

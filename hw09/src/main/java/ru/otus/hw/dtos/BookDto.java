@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class BookDto {
 
     private long id;
@@ -21,9 +21,9 @@ public class BookDto {
     private String title;
 
     @NotNull(message = "Author must be selected")
-    private AuthorDto author;
+    private AuthorDto author = new AuthorDto();
 
     @NotNull(message = "Author must be selected")
-    private List<GenreDto> genres;
+    private List<GenreDto> genres = List.of();
 
 }

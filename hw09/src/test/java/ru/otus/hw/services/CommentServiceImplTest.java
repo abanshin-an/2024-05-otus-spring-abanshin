@@ -15,6 +15,7 @@ import ru.otus.hw.dtos.AuthorDto;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.CommentDto;
 import ru.otus.hw.dtos.GenreDto;
+import ru.otus.hw.mappers.BookMapperImpl;
 import ru.otus.hw.mappers.CommentMapperImpl;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис для работы с комментариями")
 @DataJpaTest
-@Import({CommentServiceImpl.class, CommentMapperImpl.class})
+@Import({CommentServiceImpl.class, CommentMapperImpl.class, BookMapperImpl.class})
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class CommentServiceImplTest {
 
@@ -81,7 +82,7 @@ class CommentServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void saveTest() {
-        var expectedComment = new CommentDto(1, "Comment_123");
+        var expectedComment = new CommentDto(1, "Comment_123", getDbBooks().get(0));
 
         assertThat(serviceTest.findById(expectedComment.getId()))
                 .isPresent();
@@ -105,8 +106,9 @@ class CommentServiceImplTest {
     }
 
     private static List<CommentDto> getDbComments() {
+        var dbBooks = getDbBooks();
         return IntStream.range(1, 4).boxed()
-                .map(id -> new CommentDto(id, "Comment_" + id))
+                .map(id -> new CommentDto(id, "Comment_" + id, dbBooks.get(id-1)))
                 .toList();
     }
 
@@ -133,7 +135,7 @@ class CommentServiceImplTest {
                 .toList();
     }
 
-    private static List<GenreDto> getDbGenres() {
+    private static  List<GenreDto> getDbGenres() {
         return IntStream.range(1, 7).boxed()
                 .map(id -> new GenreDto(id, "Genre_" + id))
                 .toList();

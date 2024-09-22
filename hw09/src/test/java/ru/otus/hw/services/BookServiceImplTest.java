@@ -17,7 +17,6 @@ import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.mappers.BookMapperImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,9 +71,7 @@ class BookServiceImplTest {
     void insertTest() {
         var expectedBook = new BookDto(0, "BookTitle_123", dbAuthors.get(0),
                 List.of(dbGenres.get(0), dbGenres.get(2)));
-        var returnedBook = serviceTest.insert(expectedBook.getTitle(),
-                expectedBook.getAuthor().getId(),
-                expectedBook.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
+        var returnedBook = serviceTest.insert(expectedBook);
 
         assertThat(returnedBook)
                 .isNotNull()
@@ -94,10 +91,7 @@ class BookServiceImplTest {
         assertThat(serviceTest.findById(expectedBook.getId()))
                 .isPresent();
 
-        var returnedBook = serviceTest.update(expectedBook.getId(),
-                expectedBook.getTitle(),
-                expectedBook.getAuthor().getId(),
-                expectedBook.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
+        var returnedBook = serviceTest.update(expectedBook);
 
         assertThat(returnedBook)
                 .isNotNull()

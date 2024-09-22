@@ -9,6 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +25,12 @@ import org.hibernate.annotations.BatchSize;
 @Data
 @Entity
 @Table(name = "comments")
+@NamedEntityGraph(name = "comment-book-author-genres-entity-graph",
+        attributeNodes = {@NamedAttributeNode(value = "book", subgraph = "comment1")},
+        subgraphs = {@NamedSubgraph(name = "comment1",
+                attributeNodes = {
+                        @NamedAttributeNode("author"),
+                        @NamedAttributeNode("genres")})})
 public class Comment {
 
     @Id
@@ -36,7 +45,7 @@ public class Comment {
     @EqualsAndHashCode.Exclude
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
-    @BatchSize(size = 100)
+    @BatchSize(size = 10)
     private Book book;
 
 }

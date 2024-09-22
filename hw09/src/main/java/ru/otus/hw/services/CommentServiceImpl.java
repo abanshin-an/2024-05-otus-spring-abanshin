@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void deleteById(long id) {
-        commentRepository.findById(id).ifPresent(commentRepository::delete);
+        commentRepository.deleteById(id);
     }
 
     private Comment getCommentById(long id) {

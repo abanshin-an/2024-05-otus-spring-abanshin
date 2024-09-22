@@ -8,12 +8,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.dtos.AuthorDto;
 import ru.otus.hw.dtos.BookDto;
+import ru.otus.hw.dtos.BookEditDto;
 import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -47,13 +46,13 @@ class BookControllerTest {
     @MockBean
     private AuthorService authorService;
 
-    private BookDto bookByFirstId;
+    private BookEditDto bookByFirstId;
 
     @BeforeEach
     void setUp() {
-        bookByFirstId = new BookDto(BOOK_ID, TITLE_FOR_BOOK,
+        bookByFirstId = new BookEditDto(new BookDto(BOOK_ID, TITLE_FOR_BOOK,
                 new AuthorDto(1L, "Author_1"),
-                List.of(new GenreDto(1L, "Genre_1")));
+                List.of(new GenreDto(1L, "Genre_1"))));
     }
 
     @Test
@@ -70,8 +69,8 @@ class BookControllerTest {
 
     @Test
     void editBookPage() throws Exception {
-        var genres = Collections.singletonList(new GenreDto(1L, "Genre 1"));
-        var authors = Collections.singletonList(new AuthorDto(1L, "Author 1"));
+        var genres = List.of(new GenreDto(1L, "Genre 1"));
+        var authors = List.of(new AuthorDto(1L, "Author 1"));
 
         when(bookService.findById(anyLong())).thenReturn(Optional.of(bookByFirstId));
         when(genreService.findAll()).thenReturn(genres);
@@ -79,10 +78,10 @@ class BookControllerTest {
 
         mvc.perform(get("/book/1"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("book", "allGenres", "author"))
+                .andExpect(model().attributeExists("book", "allGenres", "allAuthors"))
                 .andExpect(model().attribute("book", bookByFirstId))
                 .andExpect(model().attribute("allGenres", genres))
-                .andExpect(model().attribute("author", authors))
+                .andExpect(model().attribute("allAuthors", authors))
                 .andExpect(view().name("book/edit"));
     }
 
@@ -100,16 +99,16 @@ class BookControllerTest {
 
     @Test
     void newBookPage() throws Exception {
-        var genres = Collections.singletonList(new GenreDto(1L, "Genre 1"));
-        var authors = Collections.singletonList(new AuthorDto(1L, "Author 1"));
+        var genres = List.of(new GenreDto(1L, "Genre 1"));
+        var authors = List.of(new AuthorDto(1L, "Author 1"));
 
         when(genreService.findAll()).thenReturn(genres);
         when(authorService.findAll()).thenReturn(authors);
 
         mvc.perform(get("/book/new"))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("book", "allGenres", "author"))
-                .andExpect(model().attribute("author", authors))
+                .andExpect(model().attributeExists("book", "allGenres", "allAuthors"))
+                .andExpect(model().attribute("allAuthors", authors))
                 .andExpect(model().attribute("allGenres", genres))
                 .andExpect(view().name("book/edit"));
     }
@@ -117,12 +116,12 @@ class BookControllerTest {
     @Test
     void addNewBook() throws Exception {
         when(bookService.insert(any(BookDto.class)))
-                .thenReturn(bookByFirstId);
+                .thenReturn(new BookDto());
 
         mvc.perform(post("/book/new")
                         .param("title", bookByFirstId.getTitle())
                         .param("author.id", String.valueOf(bookByFirstId.getAuthor().getId()))
-                        .param("genres.id", "1","2"))
+                        .param("genresIds", "1","2"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
@@ -131,7 +130,7 @@ class BookControllerTest {
     void deleteBook() throws Exception {
         doNothing().when(bookService).deleteById(anyLong());
 
-        mvc.perform(delete("/book/1"))
+        mvc.perform(post("/book/1/delete"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }

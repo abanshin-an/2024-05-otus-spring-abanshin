@@ -14,8 +14,6 @@ import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -45,27 +43,15 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public BookDto insert(String title, long authorId, Set<Long> genresIds) {
-        return save(0, title, authorId, genresIds);
-    }
-    @Transactional
-    @Override
     public BookDto insert(BookDto bookDto) {
-        return save(0, bookDto.getTitle(), bookDto.getAuthor().getId(),
-                bookDto.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
-    }
-
-    @Transactional
-    @Override
-    public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
-        return save(id, title, authorId, genresIds);
+        bookDto.setId(0);
+        return save(bookDto);
     }
 
     @Transactional
     @Override
     public BookDto update(BookDto bookDto) {
-        return save(bookDto.getId(), bookDto.getTitle(), bookDto.getAuthor().getId(),
-                bookDto.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet()));
+        return save(bookDto);
     }
 
     @Transactional
@@ -74,19 +60,22 @@ public class BookServiceImpl implements BookService {
         bookRepository.findById(id).ifPresent(bookRepository::delete);
     }
 
-    private BookDto save(long id, String title, long authorId, Set<Long> genresIds) {
+    private BookDto save(BookDto bookDto) {
+        var authorId = bookDto.getAuthor().getId();
+        var author = authorRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
+
+        var genresIds = bookDto.getGenres().stream().map(GenreDto::getId).toList();
         if (isEmpty(genresIds)) {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
 
-        var author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
         var genres = genreRepository.findAllByIdIn(genresIds);
         if (isEmpty(genres) || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
 
-        var book = new Book(id, title, author, genres);
+        var book = new Book(bookDto.getId(),bookDto.getTitle(), author, genres);
         return bookMapper.modelToDto(bookRepository.save(book));
     }
 }
