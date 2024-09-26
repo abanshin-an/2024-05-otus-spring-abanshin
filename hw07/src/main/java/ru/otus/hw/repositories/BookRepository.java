@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public interface BookRepository  extends JpaRepository<Book, Long> {
 
-    @EntityGraph(value = "book-author-entity-graph", type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(value = "book-genres-entity-graph", type = EntityGraph.EntityGraphType.FETCH)
     Optional<Book> findById(long id);
 
-    @EntityGraph(value = "book-genres-entity-graph", type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(value = "book-author-entity-graph", type = EntityGraph.EntityGraphType.FETCH)
     @Nonnull
     List<Book> findAll();
 
