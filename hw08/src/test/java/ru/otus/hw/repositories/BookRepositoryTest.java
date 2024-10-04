@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -24,6 +25,9 @@ class BookRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     private List<Author> dbAuthors;
 
@@ -74,10 +78,10 @@ class BookRepositoryTest {
     void saveUpdateTest() {
         var expectedBook = new Book("1", "BookTitle_10500", dbAuthors.get(2),
                 List.of(dbGenres.get(4), dbGenres.get(5)));
-        var returnedBookOptional = bookRepository.findById(expectedBook.getId());
+        var returnedBookOptional = mongoTemplate.findById(expectedBook.getId(), Book.class);
 
         assertThat(returnedBookOptional)
-                .isPresent();
+                .isNotNull();
 
         var returnedBook = bookRepository.save(expectedBook);
 
@@ -90,13 +94,13 @@ class BookRepositoryTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     @Test
     void deleteTest() {
-        var book = bookRepository.findById("1");
+        var book = mongoTemplate.findById("1", Book.class);
 
-        assertThat(book).isPresent();
+        assertThat(book).isNotNull();
 
-        bookRepository.delete(book.get());
+        bookRepository.deleteById(book.getId());
 
-        assertThat(bookRepository.findById("1")).isEmpty();
+        assertThat(mongoTemplate.findById("1",Book.class)).isNull();
     }
 
     private void recursiveComparingBook(Book actualBook, Book expectedBook) {

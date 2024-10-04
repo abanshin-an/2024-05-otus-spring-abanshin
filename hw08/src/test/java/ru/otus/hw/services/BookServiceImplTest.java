@@ -8,11 +8,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
@@ -29,6 +32,9 @@ class BookServiceImplTest {
 
     @Autowired
     private BookServiceImpl serviceTest;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     private List<Author> dbAuthors;
 
@@ -104,13 +110,19 @@ class BookServiceImplTest {
     }
 
     @DisplayName("должен удалять книгу")
-    @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @Test
     void deleteTest() {
-        var book = serviceTest.findById("1");
-        assertThat(book).isPresent();
-        serviceTest.deleteById(book.get().getId());
-        assertThat(serviceTest.findById("1")).isEmpty();
+        BasicQuery commentQuery = new BasicQuery("{'book.$id' : '1' }");
+        var book = mongoTemplate.findById("1", Book.class);
+        var comment = mongoTemplate.find(commentQuery, Comment.class);
+        assertThat(book).isNotNull();
+        assertThat(comment).hasSize(1);
+
+        serviceTest.deleteById(book.getId());
+
+        assertThat(mongoTemplate.findById("1",Book.class)).isNull();
+        assertThat(mongoTemplate.find(commentQuery, Comment.class)).hasSize(0);
     }
 
     private static List<Author> getDbAuthors() {

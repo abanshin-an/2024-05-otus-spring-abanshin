@@ -24,7 +24,7 @@ public class Comment {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @DBRef(lazy = true)
+    @DBRef
     private Book book;
 
 }
