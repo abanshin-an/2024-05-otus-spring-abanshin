@@ -54,7 +54,7 @@ class CommentControllerTest {
         bookByFirstId = new BookDto(BOOK_ID, TITLE_FOR_BOOK,
                 new AuthorDto(1L, "Author_1"),
                 List.of(new GenreDto(1L, "Genre_1")));
-        comments = List.of(new CommentDto(COMMENT_ID, COMMENT_TEXT, bookByFirstId));
+        comments = List.of(new CommentDto(COMMENT_ID, COMMENT_TEXT));
     }
 
     @Test

@@ -17,5 +17,5 @@ public class CommentDto {
     @Size(max = 1000, message = "The title size is limited to 1000 characters")
     private String content;
 
-    private BookDto book;
+
 }

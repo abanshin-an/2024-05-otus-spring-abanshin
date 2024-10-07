@@ -31,8 +31,8 @@ import java.util.List;
 @Table(name = "books")
 @NamedEntityGraph(name = "book-author-entity-graph",
         attributeNodes = {@NamedAttributeNode("author")})
-@NamedEntityGraph(name = "book-author-genres-entity-graph",
-        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genres")})
+@NamedEntityGraph(name = "book-genres-entity-graph",
+        attributeNodes = {@NamedAttributeNode("genres")})
 public class Book {
 
     @Id
