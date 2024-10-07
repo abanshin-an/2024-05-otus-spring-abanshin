@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Comments for Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        textarea {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .add-button {
+            background-color: steelblue;
+        }
+
+        .add-button:hover {
+            background-color: darkblue;
+        }
+
+        .edit-button {
+            background-color: darkorange;
+        }
+
+        .edit-button:hover {
+            background-color: orange;
+        }
+
+        .delete-button {
+            background-color: darkred;
+        }
+
+        .delete-button:hover {
+            background-color: red;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: steelblue;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: darkblue;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h3>Comments for Book: <span th:text="${title}"></span></h3>
+
+    <form th:action="@{/book/{bookId}/comments(bookId=${bookId})}" method="post" th:object="${comment}">
+        <label for="text">Comment Text:</label>
+        <textarea id="text" name="text" th:field="*{content}" required></textarea>
+        <div class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+        <button type="submit" class="add-button">Add Comment</button>
+    </form>
+
+    <div th:if="${comments != null}">
+        <h4>Existing Comments:</h4>
+        <ul>
+            <li th:each="comment : ${comments}">
+                <p th:text="${comment.content}"></p>
+                <form th:action="@{/book/{bookId}/comments/{id}/edit(bookId=${bookId}, id=${comment.id})}" style="display:inline">
+                    <button type="submit" class="edit-button">Edit</button>
+                </form>
+<!--                <a th:href="@{/book/{bookId}/comments/{id}/edit(bookId=${bookId}, id=${comment.id})}" class="edit-button">Edit</a>-->
+                <form th:action="@{/book/{bookId}/comments/{id}/delete(bookId=${bookId}, id=${comment.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <a href="/" class="back-link">Back</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+body {
+    padding: 50px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+input, select {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+input[type=checkbox] {
+    border: 2px solid red;
+    border-radius: 4px;
+    width: 10%;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: steelblue;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: darkblue;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    text-decoration: none;
+    color: steelblue;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    color: darkblue;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 15px;
+    border: 1px solid steelblue;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: steelblue;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: darkblue;
+}
+
+.delete-button {
+    background-color: darkred;
+}
+
+.delete-button:hover {
+    background-color: red;
+}
+
+.comment-button {
+    background-color: orange;
+}
+
+.comment-button:hover {
+    background-color: darkorange;
+}
+
+.action-buttons form {
+    display: inline;
+}
+
+.add-button-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.add-button-container button {
+    background-color: green;
+}
+
+.add-button-container button:hover {
+    background-color: darkgreen;
+}
